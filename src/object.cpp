@@ -97,9 +97,29 @@ void Object::cameraMatrixCalc(data_visualization::Camera camera_) {
         Object::normal = Object::normal.inverse().transpose();
     };
 
-bool Object::vanillaProgramLoad() {
-    Object::vanilla = LoadProgram(vertexShaderPath, fragmentShaderPath);
-    return Object::vanilla >= 0;
+bool Object::vanillaProgramLoad()
+{
+    int shader = LoadProgram(vertexShaderPath, fragmentShaderPath);
+    Object::vanilla = shader;
+    return shader >= 0;
+}
+
+void Object::render() const
+{
+    glUseProgram(program);
+
+    Eigen::Vector3f lightColor(1.0f, 1.0f, 1.0f);
+    glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, lightColor.data());
+    Eigen::Vector3f objectColor(0.7f, 0.5f, 0.2f);
+
+    glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, objectColor.data());
+
+    glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, Object::view.data());
+    glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, Object::model.data());
+    glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, Object::projection.data());
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, qttyFaces, GL_UNSIGNED_INT, 0);
 }
 
 

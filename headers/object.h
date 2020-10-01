@@ -12,7 +12,7 @@ enum ProgramVars {projMatrix = 0, mvMatrix = 1, normalMatrix = 2, lightPos = 3};
 class Object {
 
 public:
-    virtual void render() = 0;
+    void render() const;
     virtual void update(const float deltatime) = 0;
     virtual void event(QEvent *event) = 0;
     virtual bool load() = 0;
@@ -25,9 +25,8 @@ protected:
 
     static unsigned int vanilla;
 
-    unsigned int program;
+    unsigned int VAO, program = 0, qttyFaces;
     std::vector<ProgramVars> programVars;
-    unsigned int VAO;
 
 private:
 
