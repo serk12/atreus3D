@@ -1,18 +1,19 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
+#include <GL/glew.h>
 
-#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
 #include <QElapsedTimer>
 #include <QMouseEvent>
 #include <QTimer>
+#include <vector>
 
 #include "fpscount.h"
 #include "camera.h"
+#include "object.h"
 
-QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
-
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class GLWidget : public QOpenGLWidget
 {
     Q_OBJECT
 
@@ -33,12 +34,20 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    data_visualization::Camera camera_;
-
+    //FPS limiter + counter
+    void updateFPS();
     QElapsedTimer frameTime;
     QTimer* fpsTimer;
     int frameCounter = 0;
+
+    //OpenGL initialization
+    data_visualization::Camera camera_;
     float width_, height_;
+    bool initialized = false;
+
+    //objects = meshes || particles
+    std::vector<Object*> objects;
+
 };
 
 
