@@ -7,12 +7,14 @@
 #include <vector>
 
 #include "camera.h"
+
 enum ProgramVars {projMatrix = 0, mvMatrix = 1, normalMatrix = 2, lightPos = 3};
 
 class Object {
 
 public:
     void render() const;
+
     virtual void update(const float deltatime) = 0;
     virtual void event(QEvent *event) = 0;
     virtual bool load() = 0;

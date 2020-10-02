@@ -16,6 +16,8 @@ GLWidget::GLWidget(QWidget *parent)
     connect(fpsTimer , SIGNAL(timeout()), this, SLOT(update()));
     fpsTimer->start(10);
 
+    frameTime.start();
+
     Mesh *a = new Mesh();
     objects.push_back(a);
     create();
@@ -87,12 +89,17 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
+    switch (event->button()) {
+    case Qt::LeftButton:
         camera_.StartRotating(event->x(), event->y());
-    }
-    if (event->button() == Qt::RightButton) {
+        break;
+    case Qt::RightButton:
         camera_.StartZooming(event->x(), event->y());
+        break;
+    default:
+        break;
     }
+
     update();
 }
 
@@ -105,12 +112,17 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton) {
+    switch (event->button()) {
+    case Qt::LeftButton:
         camera_.StopRotating(event->x(), event->y());
-    }
-    if (event->button() == Qt::RightButton) {
+        break;
+    case Qt::RightButton:
         camera_.StopZooming(event->x(), event->y());
+        break;
+    default:
+        break;
     }
+
     update();
 }
 

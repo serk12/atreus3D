@@ -120,6 +120,7 @@ void Object::render() const
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, qttyFaces, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 
