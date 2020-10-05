@@ -3,7 +3,10 @@
 #include <eigen3/Eigen/Geometry>
 #include <fstream>
 #include <iostream>
+
 #include "mesh.h"
+#include "particle.h"
+#include "simulation.h"
 
 const double kFieldOfView = 60;
 const double kZNear = 0.0001;
@@ -13,19 +16,15 @@ GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
     fpsTimer = new QTimer(this);
-    connect(fpsTimer , SIGNAL(timeout()), this, SLOT(update()));
+    connect(fpsTimer, SIGNAL(timeout()), this, SLOT(update()));
     fpsTimer->start(10);
-
     frameTime.start();
-
-    Mesh *a = new Mesh();
-    objects.push_back(a);
-    create();
 }
 
 GLWidget::~GLWidget()
 {
     cleanup();
+    Object::deleteVanillas();
 }
 
 void GLWidget::cleanup()
@@ -44,11 +43,12 @@ void GLWidget::initializeGL()
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
 
-    bool no_problems = Object::vanillaProgramLoad();
-    for (Object* &o : objects) {
-        no_problems = no_problems && o->load();
-    }
+    bool no_problems = Object::vanillaProgramsLoad();
     if (! no_problems) exit(0);
+    Simulation::loadSim(objects);
+    for (Object* &o : objects) {
+        o->load();
+    }
 
     initialized = true;
 }
@@ -59,6 +59,8 @@ void GLWidget::updateFPS()
     if (frameTime.elapsed() >= 1000) {
         double fps = frameCounter / ((double)frameTime.elapsed()/1000.0);
         FPSCount::setFPS(int(fps));
+        frameTime.start();
+        previousTime = frameCounter = 0;
     }
 }
 
@@ -68,20 +70,21 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (initialized) {
-        camera_.SetViewport();
         Object::cameraMatrixCalc(camera_);
+        float dt = frameTime.elapsed() - previousTime;
         for (Object* &o : objects) {
+            o->update(dt);
             o->render();
         }
+        previousTime = frameTime.elapsed();
     }
     updateFPS();
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
-    if (h == 0) h = 1;
     width_ = w;
-    height_ = h;
+    height_ = (h == 0)? 1 : h;
 
     camera_.SetViewport(0, 0, w, h);
     camera_.SetProjection(kFieldOfView, kZNear, kZFar);

@@ -4,15 +4,17 @@
 
 #include "object.h"
 
-Eigen::Matrix4f Object::projection, Object::view, Object::model, Object::t, Object::normal;
-unsigned int Object::vanilla;
+const char vertexVanillaPath[]   = "../atreus3D/shaders/vanilla.vert";
+const char fragmentVanillaPath[] = "../atreus3D/shaders/vanilla.frag";
 
-const char vertexShaderPath[] = "../atreus3D/shaders/vanilla.vert";
-const char fragmentShaderPath[] = "../atreus3D/shaders/vanilla.frag";
+const char vertexSpherePath[]   = "../atreus3D/shaders/sphere.vert";
+const char fragmentSpherePath[] = "../atreus3D/shaders/sphere.frag";
+const char geometriSpherePath[] = "../atreus3D/shaders/sphere.geo";
 
-namespace {
-
-    int LoadShader(const char *shaderSource, GLenum shaderType) {
+namespace
+{
+    int LoadShader(const char *shaderSource, GLenum shaderType)
+    {
         int shader = glCreateShader(shaderType);
         glShaderSource(shader, 1, &shaderSource, NULL);
         glCompileShader(shader);
@@ -23,13 +25,14 @@ namespace {
         if (!success)
         {
            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-           std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+           std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << "\n" << shaderSource << std::endl;
            return -1;
         }
         return shader;
     }
 
-    int LoadShaderFromFile(const char* shaderPath, GLenum shaderType) {
+    int LoadShaderFromFile(const char* shaderPath, GLenum shaderType)
+    {
         std::ifstream shaderFile;
 
         shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -41,12 +44,13 @@ namespace {
             std::string shaderSource = shaderStream.str();
             return LoadShader(shaderSource.c_str(), shaderType);
         } catch (std::ifstream::failure& e) {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ:" << shaderPath << std::endl;
             return -1;
         }
     }
 
-    int LoadProgram(const char *vPath, const char *fPath, const char *gPath = nullptr) {
+    int LoadProgram(const char *vPath, const char *fPath, const char *gPath = nullptr)
+    {
         int vertexShader = LoadShaderFromFile(vPath, GL_VERTEX_SHADER);
         int fragmentShader = LoadShaderFromFile(fPath, GL_FRAGMENT_SHADER);
         if (vertexShader < 0 or fragmentShader < 0) {
@@ -54,7 +58,7 @@ namespace {
         }
         int geometryShader = -1;
         if (gPath != nullptr) {
-            geometryShader = LoadShader(gPath, GL_GEOMETRY_SHADER);
+            geometryShader = LoadShaderFromFile(gPath, GL_GEOMETRY_SHADER);
             if (geometryShader < 0) return -1;
         }
 
@@ -82,7 +86,15 @@ namespace {
     }
 }
 
-void Object::cameraMatrixCalc(data_visualization::Camera camera_) {
+Object::~Object()
+{
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+void Object::cameraMatrixCalc(data_visualization::Camera camera_)
+{
         camera_.SetViewport();
 
         Object::projection = camera_.SetProjection();
@@ -97,30 +109,115 @@ void Object::cameraMatrixCalc(data_visualization::Camera camera_) {
         Object::normal = Object::normal.inverse().transpose();
     };
 
-bool Object::vanillaProgramLoad()
+int Object::loadShader(const char * vertex, const char *frag, const char *geo = nullptr)
 {
-    int shader = LoadProgram(vertexShaderPath, fragmentShaderPath);
-    Object::vanilla = shader;
-    return shader >= 0;
+    return LoadProgram(vertex, frag, geo);
 }
 
-void Object::render() const
+bool Object::vanillaProgramsLoad()
+{
+    int vanilla = LoadProgram(vertexVanillaPath, fragmentVanillaPath);
+    int sphere = LoadProgram(vertexSpherePath, fragmentSpherePath, geometriSpherePath);
+    if (vanilla <= 0 || sphere <= 0) return false;
+    Object::programsList.push_back(vanilla);
+    Object::programsList.push_back(sphere);
+    return true;
+}
+
+void Object::deleteVanillas()
+{
+    for (int vanilla : Object::programsList) {
+        glDeleteProgram(vanilla);
+    }
+}
+
+void Object::renderType(int type) const
 {
     glUseProgram(program);
 
-    Eigen::Vector3f lightColor(1.0f, 1.0f, 1.0f);
-    glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, lightColor.data());
-    Eigen::Vector3f objectColor(0.7f, 0.5f, 0.2f);
-
+    glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, Object::lightColor.data());
     glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, objectColor.data());
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, Object::view.data());
-    glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, Object::model.data());
+    glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, Object::view.data());    
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, Object::projection.data());
 
+    Eigen::Affine3f translation;
+    translation.matrix() = Object::model;
+    translation.translation() = p;
+    Eigen::Matrix4f modelObject = translation.matrix();
+    glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, modelObject.data());
+
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, qttyFaces, GL_UNSIGNED_INT, 0);
+    glDrawElements(type, qttyFaces, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+void Object::load()
+{
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertices.size(), &vertices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indices.size(), &indices[0], GL_STATIC_DRAW);
+
+    // set position to location = 0
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void Object::solver(const float dt)
+{
+    Eigen::Vector3f aux_p = p;
+
+    switch(solverType) {
+    case SolverType::euler:
+        p = p + dt*v;
+        v = v + dt*(w_i*f_final);
+        break;
+    case SolverType::semiEuler:
+        v = v + dt*(w_i*f_final);
+        p = p + dt*v;
+        break;
+    case SolverType::verlet:
+        p = p + k_d*(p-p_pass)+dt*(dt*(f_final*m));
+        break;
+    case SolverType::rungeKuta2: //semiEuler for the moment
+        v = v + dt*(w_i*f_final);
+        p = p + dt/2.0f * (v + v);
+        break;
+    default:
+        break;
+    }
+
+    p_pass = aux_p;
+}
+
+void Object::initSolver()
+{
+    if (m == -1) physicsType = PhysicsType::immovable;
+    else if (m == -2) physicsType = PhysicsType::transparent;
+    w_i = (m < 0)? 0 : 1.0f/m;
+    f_final = Eigen::Vector3f(0.0f,0.0f,0.0f);
+    p_pass  = Eigen::Vector3f(2.0f,2.0f,2.0f);
+}
+
+void Object::update(const float deltatime)
+{
+    forceUpdate();
+    solver(deltatime);
+    bool update = true;
+    while (update) {
+        collisionDetect();
+        update = possitionCorrect();
+    }
 }
 
 

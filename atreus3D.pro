@@ -15,7 +15,9 @@ SOURCES += \
     src/mainwindow.cpp \
     src/fpscount.cpp \
     src/mesh.cc \
-    src/object.cpp
+    src/object.cpp \
+    src/particle.cc \
+    src/simulation.cpp
 
 INCLUDEPATH += headers/ \
     /usr/local/lib/cpp/Eigen/
@@ -27,7 +29,9 @@ HEADERS += \
     headers/glwidget.h \
     headers/mainwindow.h \
     headers/mesh.h \
-    headers/object.h
+    headers/object.h \
+    headers/particle.h \
+    headers/simulation.h
 
 FORMS += \
     forms/mainwindow.ui
@@ -39,5 +43,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     .gitignore \
+    shaders/sphere.frag \
+    shaders/sphere.geo \
+    shaders/sphere.vert \
     shaders/vanilla.frag \
     shaders/vanilla.vert

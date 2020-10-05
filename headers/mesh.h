@@ -1,22 +1,24 @@
 #ifndef MESH_H
 #define MESH_H
-#include <QOpenGLVertexArrayObject>
-#include <vector>
+#include <GL/glew.h>
 
 #include "object.h"
 
 class Mesh : public Object {
 public:
     Mesh();
-    Mesh(const char file[]);
+    Mesh(const std::vector<float> vertices, const std::vector<unsigned int> indices,const unsigned int programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const GLenum type);
+    ~Mesh();
 
-    void update(const float deltatime) final;
+    void render() const final;
     void event(QEvent *event) final;
-    bool load() final;
+
 private:
-    unsigned int VBO, EBO;
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
+    GLenum type = GL_TRIANGLES;
+
+    void forceUpdate() final;
+    void collisionDetect() final;
+    bool possitionCorrect() final;
 };
 
 #endif // MESH_H

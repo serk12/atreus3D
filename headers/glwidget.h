@@ -38,6 +38,7 @@ private:
     void updateFPS();
     QElapsedTimer frameTime;
     QTimer* fpsTimer;
+    float previousTime = 0.0f;
     int frameCounter = 0;
 
     //OpenGL initialization
