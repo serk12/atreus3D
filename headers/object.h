@@ -33,7 +33,7 @@ protected:
     inline static Eigen::Matrix4f projection, view, model, t, normal;
     inline static std::vector<unsigned int> programsList;
 
-    unsigned int VAO, VBO, EBO, qttyFaces, program;
+    unsigned int VAO, VBO, EBO, qttyFaces;
     Eigen::Vector3f objectColor;
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
@@ -43,17 +43,19 @@ protected:
 
     // phisics variables
     inline static const float k_d = 0.975f;
-    inline static const float gravityScale = 0.00000000005f;
+    inline static const float gravityScale = 0.03f;
     inline static const Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
     Eigen::Vector3f p, p_pass, v, f;
     float w_i, m;
     SolverType  solverType  = SolverType::Euler;
     PhysicsType physicsType = PhysicsType::Normal;
+    ShaderType  shaderType;
 
     virtual void forceUpdate() = 0;
     virtual void collisionDetect(const std::list<Object*>& objects) = 0;
     virtual bool possitionCorrect() = 0;
+    virtual float getRadius() const = 0;
     void solver(const float dt);
     void initSolver();
 

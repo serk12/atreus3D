@@ -1,7 +1,7 @@
 #include "simulation.h"
 
 #include "particle.h"
-#include "mesh.h"
+#include "meshTypes.h"
 
 #include <random>
 #include <iostream>
@@ -35,7 +35,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
         0
     };
 
-    Mesh *a = new Mesh(box, boxi, 0, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f),Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP, Mesh::MeshType::Plane);
+    Polygon *a = new Polygon(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f),Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
     objects.first.push_back(a);
 
     float r = 0.45f;
@@ -48,11 +48,11 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
         0,1,2,
         2,1,0,
     };
-    a = new Mesh(box, boxi, Eigen::Vector3f(-0.25f, -0.25f, -0.25f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, Mesh::MeshType::Triangle);
-    objects.first.push_back(a);
+    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(-0.25f, -0.25f, -0.25f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
+    objects.first.push_back(t);
 
-    a = new Mesh({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, GL_POINTS, Mesh::MeshType::Sphere);
-    objects.first.push_back(a);
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1);
+    objects.first.push_back(s);
 
 
     std::random_device rd;
@@ -61,7 +61,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
 
     for (int i = 1; i < 50; ++i) {
         float rx = dis(gen), rz = dis(gen), ry = dis(gen);
-        Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f*ry, 0.0f), Eigen::Vector3f(0.00004f*(rx-0.5f), 0.00005f, 0.00004f*(rz-0.5f)), 0.05f);
+        Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f*ry, 0.0f), Eigen::Vector3f(0.3f*(rx-0.5f), 0.5f, 0.3f*(rz-0.5f)), 0.05f);
         objects.second.push_back(b);
     }
     return true;

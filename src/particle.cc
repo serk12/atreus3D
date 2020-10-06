@@ -2,15 +2,15 @@
 #include <iostream>
 #include "particle.h"
 
-Particle::Particle() : Particle(int(ShaderType::Sphere), Eigen::Vector3f(0.2f, 0.6f, 0.5f),
+Particle::Particle() : Particle(ShaderType::Sphere, Eigen::Vector3f(0.2f, 0.6f, 0.5f),
                                 Eigen::Vector3f(0.0f, 0.0f, 0.0f),
                                 Eigen::Vector3f(0.0002f, 0.0f, 0.0f), 0.05f) {}
 
-Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m) : Particle(int(ShaderType::Sphere), Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m) {}
+Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m) {}
 
-Particle::Particle(const unsigned int programIndex,const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
+Particle::Particle(const ShaderType programIndex,const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
 {
-    this->program = Object::programsList[programIndex];
+    this->shaderType = programIndex;
     this->objectColor = color;
     this->p = p;
     this->v = v;
@@ -23,6 +23,10 @@ Particle::Particle(const unsigned int programIndex,const Eigen::Vector3f color, 
     initSolver();
 }
 
+float Particle::getRadius() const
+{
+    return r;
+}
 
 void Particle::render() const
 {
@@ -33,11 +37,23 @@ void Particle::event(QEvent *) {}
 
 void Particle::forceUpdate()
 {
-    this->f = gravity;
+    this->f = gravity*m;
 }
 
 void Particle::collisionDetect(const std::list<Object*>& meshs)
 {
+    if( p.x() < 0.0f) {
+        p.x() = 0.0f;
+        v.x() = -v.x();
+    }
+    if( p.y() < 0.0f) {
+        p.y() = 0.0f;
+        v.y() = -v.y();
+    }
+    if( p.z() < 0.0f) {
+        p.z() = 0.0f;
+        v.z() = -v.z();
+    }
 }
 
 bool Particle::possitionCorrect() {return false;}

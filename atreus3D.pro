@@ -15,6 +15,7 @@ SOURCES += \
     src/mainwindow.cpp \
     src/fpscount.cpp \
     src/mesh.cc \
+    src/meshTypes.cpp \
     src/object.cpp \
     src/particle.cc \
     src/simulation.cpp
@@ -29,6 +30,7 @@ HEADERS += \
     headers/glwidget.h \
     headers/mainwindow.h \
     headers/mesh.h \
+    headers/meshTypes.h \
     headers/object.h \
     headers/particle.h \
     headers/simulation.h

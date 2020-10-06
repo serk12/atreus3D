@@ -7,6 +7,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform float rSphere;
+
 out vec2 UV;
 out vec4 fColor;
 
@@ -19,7 +21,7 @@ void billboard(vec4 position)
     vec3 cameraRi = vec3(view[0][0], view[1][0], view[2][0]);
     vec3 cameraUp = vec3(view[0][1], view[1][1], view[2][1]);
 
-    float r = 0.03125;
+    float r = rSphere;
     vec4 p1 = MVP * vec4(position.xyz + cameraRi*r + cameraUp*r, position.w);
     vec4 p2 = MVP * vec4(position.xyz - cameraRi*r + cameraUp*r, position.w);
     vec4 p3 = MVP * vec4(position.xyz + cameraRi*r - cameraUp*r, position.w);

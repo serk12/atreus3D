@@ -135,6 +135,7 @@ void Object::deleteVanillas()
 
 void Object::renderType(int type) const
 {
+    unsigned int program = programsList[int(shaderType)];
     glUseProgram(program);
 
     glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, Object::lightColor.data());
@@ -148,6 +149,16 @@ void Object::renderType(int type) const
     translation.translation() = p;
     Eigen::Matrix4f modelObject = translation.matrix();
     glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, modelObject.data());
+
+    switch (shaderType) {
+    case ShaderType::Sphere:
+        glUniform1f(glGetUniformLocation(program, "rSphere"), getRadius());
+        break;
+    case ShaderType::Vanilla:
+        break;
+    default:
+        break;
+    }
 
     glBindVertexArray(VAO);
     glDrawElements(type, qttyFaces, GL_UNSIGNED_INT, 0);
@@ -175,8 +186,9 @@ void Object::load()
     glBindVertexArray(0);
 }
 
-void Object::solver(const float dt)
+void Object::solver(const float dtMs)
 {
+    float dt = dtMs/1000.0f;
     Eigen::Vector3f aux_p = p;
 
     switch(solverType) {

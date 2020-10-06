@@ -74,7 +74,9 @@ void GLWidget::paintGL()
 
     if (initialized) {
         Object::cameraMatrixCalc(camera_);
-        float dt = frameTime.elapsed() - previousTime;
+        float currentTime = frameTime.elapsed();
+        float dt = currentTime - previousTime;
+        previousTime = currentTime;
 
         for (Object* &o : objects.first) {
             o->update(dt, objects.second);
@@ -84,7 +86,6 @@ void GLWidget::paintGL()
             o->update(dt, objects.first);
             o->render();
         }
-        previousTime = frameTime.elapsed();
     }
     updateFPS();
 }
