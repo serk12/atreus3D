@@ -46,7 +46,10 @@ void GLWidget::initializeGL()
     bool no_problems = Object::vanillaProgramsLoad();
     if (! no_problems) exit(0);
     Simulation::loadSim(objects);
-    for (Object* &o : objects) {
+    for (Object* &o : objects.first) {
+        o->load();
+    }
+    for (Object* &o : objects.second) {
         o->load();
     }
 
@@ -72,8 +75,13 @@ void GLWidget::paintGL()
     if (initialized) {
         Object::cameraMatrixCalc(camera_);
         float dt = frameTime.elapsed() - previousTime;
-        for (Object* &o : objects) {
-            o->update(dt);
+
+        for (Object* &o : objects.first) {
+            o->update(dt, objects.second);
+            o->render();
+        }
+        for (Object* &o : objects.second) {
+            o->update(dt, objects.first);
             o->render();
         }
         previousTime = frameTime.elapsed();

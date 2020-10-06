@@ -17,7 +17,6 @@ Particle::Particle(const unsigned int programIndex,const Eigen::Vector3f color, 
     this->m = m;
 
     //predefined
-    this->objectType = ObjectType::Particle;
     vertices = {0.0f, 0.0f,  0.0f};
     indices = {0};
     qttyFaces = vertices.size();
@@ -36,5 +35,9 @@ void Particle::forceUpdate()
 {
     this->f = gravity;
 }
-void Particle::collisionDetect() {}
+
+void Particle::collisionDetect(const std::list<Object*>& meshs)
+{
+}
+
 bool Particle::possitionCorrect() {return false;}

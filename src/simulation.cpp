@@ -6,7 +6,7 @@
 #include <random>
 #include <iostream>
 
-bool Simulation::loadSim(std::vector<Object *> &objects)
+bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects)
 {
     float rx = 0.75f;
     float ry = 0.3f;
@@ -35,8 +35,8 @@ bool Simulation::loadSim(std::vector<Object *> &objects)
         0
     };
 
-    Mesh *a = new Mesh(box, boxi, 0, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f),Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
-    objects.push_back(a);
+    Mesh *a = new Mesh(box, boxi, 0, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f),Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP, Mesh::MeshType::Plane);
+    objects.first.push_back(a);
 
     float r = 0.45f;
     box = {
@@ -48,18 +48,21 @@ bool Simulation::loadSim(std::vector<Object *> &objects)
         0,1,2,
         2,1,0,
     };
-    a = new Mesh(box, boxi, Eigen::Vector3f(-0.25f, -0.25f, -0.25f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
-    objects.push_back(a);
+    a = new Mesh(box, boxi, Eigen::Vector3f(-0.25f, -0.25f, -0.25f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, Mesh::MeshType::Triangle);
+    objects.first.push_back(a);
+
+    a = new Mesh({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, GL_POINTS, Mesh::MeshType::Sphere);
+    objects.first.push_back(a);
 
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
 
-    for (int i = 1; i < 11; ++i) {
-        float rx = dis(gen), rz = dis(gen);
-        Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.00004f*(rx-0.5f), 0.00005f, 0.00004f*(rz-0.5f)), 0.05f);
-        objects.push_back(b);
+    for (int i = 1; i < 50; ++i) {
+        float rx = dis(gen), rz = dis(gen), ry = dis(gen);
+        Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f*ry, 0.0f), Eigen::Vector3f(0.00004f*(rx-0.5f), 0.00005f, 0.00004f*(rz-0.5f)), 0.05f);
+        objects.second.push_back(b);
     }
     return true;
 }

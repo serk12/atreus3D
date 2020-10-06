@@ -3,6 +3,7 @@
 
 #include <eigen3/Eigen/Geometry>
 #include <QEvent>
+#include <list>
 #include "camera.h"
 
 #define QTTYSHADERS 2
@@ -12,14 +13,13 @@ class Object {
 public:
     enum SolverType  {Euler = 0, SemiEuler = 1, Verlet = 2, RungeKuta2 = 3};
     enum PhysicsType {Normal = 0, Immovable = 1, Transparent = 2};
-    enum ObjectType  {Mesh = 0, Particle = 1};
     enum ShaderType  {Vanilla = 0, Sphere = 1};
 
     ~Object();
     virtual void render() const = 0;
     virtual void event(QEvent *event) = 0;
 
-    void update(const float deltatime);
+    void update(const float deltatime, const std::list<Object*>& meshs);
 
     static void cameraMatrixCalc(data_visualization::Camera camera_);
     static bool vanillaProgramsLoad();
@@ -50,10 +50,9 @@ protected:
     float w_i, m;
     SolverType  solverType  = SolverType::Euler;
     PhysicsType physicsType = PhysicsType::Normal;
-    ObjectType  objectType;
 
     virtual void forceUpdate() = 0;
-    virtual void collisionDetect() = 0;
+    virtual void collisionDetect(const std::list<Object*>& objects) = 0;
     virtual bool possitionCorrect() = 0;
     void solver(const float dt);
     void initSolver();

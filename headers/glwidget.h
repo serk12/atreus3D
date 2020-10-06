@@ -7,11 +7,13 @@
 #include <QElapsedTimer>
 #include <QMouseEvent>
 #include <QTimer>
-#include <vector>
+#include <list>
 
 #include "fpscount.h"
 #include "camera.h"
 #include "object.h"
+#include "mesh.h"
+#include "particle.h"
 
 class GLWidget : public QOpenGLWidget
 {
@@ -46,8 +48,8 @@ private:
     float width_, height_;
     bool initialized = false;
 
-    //objects = meshes || particles
-    std::vector<Object*> objects;
+    //objects = meshes,  particles
+    std::pair<std::list<Object*>, std::list<Object*> > objects;
 
 };
 

@@ -211,13 +211,13 @@ void Object::initSolver()
     p_pass  = Eigen::Vector3f(2.0f,2.0f,2.0f);
 }
 
-void Object::update(const float deltatime)
+void Object::update(const float deltatime, const std::list<Object*>& meshs)
 {
     forceUpdate();
     solver(deltatime);
     bool update = true;
     while (update) {
-        collisionDetect();
+        collisionDetect(meshs);
         update = possitionCorrect();
     }
 }

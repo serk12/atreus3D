@@ -1,7 +1,9 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 #include <GL/glew.h>
+#include <list>
 
+#include "mesh.h"
 #include "object.h"
 
 class Particle : public Object {
@@ -18,7 +20,7 @@ private:
     inline static const GLenum TYPE = GL_POINTS;
 
     void forceUpdate() final;
-    void collisionDetect() final;
+    void collisionDetect(const std::list<Object*>& meshs) final;
     bool possitionCorrect() final;
 };
 
