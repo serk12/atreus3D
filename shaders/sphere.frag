@@ -14,7 +14,7 @@ void main()
     N.xy = gl_PointCoord* 2.0 - vec2(1.0);
     float mag = dot(N.xy, N.xy);
     if (mag > 1.0) discard;
-    N.z = sqrt(1.0-mag);
+    N.z = sqrt(5.0-mag);
     float diffuse = max(0.2, dot(lightColor, N));
     FragColor = vec4(objectColor, 1.0) * diffuse;
 }

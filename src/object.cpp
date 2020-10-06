@@ -1,4 +1,5 @@
 #include <GL/glew.h>
+#include <QTimer>
 #include <iostream>
 #include <fstream>
 
@@ -119,8 +120,9 @@ bool Object::vanillaProgramsLoad()
     int vanilla = LoadProgram(vertexVanillaPath, fragmentVanillaPath);
     int sphere = LoadProgram(vertexSpherePath, fragmentSpherePath, geometriSpherePath);
     if (vanilla <= 0 || sphere <= 0) return false;
-    Object::programsList.push_back(vanilla);
-    Object::programsList.push_back(sphere);
+    Object::programsList.resize(QTTYSHADERS);
+    Object::programsList[int(ShaderType::Vanilla)] = vanilla;
+    Object::programsList[int(ShaderType::Sphere)] = sphere;
     return true;
 }
 
@@ -178,19 +180,19 @@ void Object::solver(const float dt)
     Eigen::Vector3f aux_p = p;
 
     switch(solverType) {
-    case SolverType::euler:
+    case SolverType::Euler:
         p = p + dt*v;
-        v = v + dt*(w_i*f_final);
+        v = v + dt*(w_i*f);
         break;
-    case SolverType::semiEuler:
-        v = v + dt*(w_i*f_final);
+    case SolverType::SemiEuler:
+        v = v + dt*(w_i*f);
         p = p + dt*v;
         break;
-    case SolverType::verlet:
-        p = p + k_d*(p-p_pass)+dt*(dt*(f_final*m));
+    case SolverType::Verlet:
+        p = p + k_d*(p-p_pass)+dt*(dt*(f*m));
         break;
-    case SolverType::rungeKuta2: //semiEuler for the moment
-        v = v + dt*(w_i*f_final);
+    case SolverType::RungeKuta2: //semiEuler for the moment
+        v = v + dt*(w_i*f);
         p = p + dt/2.0f * (v + v);
         break;
     default:
@@ -202,10 +204,10 @@ void Object::solver(const float dt)
 
 void Object::initSolver()
 {
-    if (m == -1) physicsType = PhysicsType::immovable;
-    else if (m == -2) physicsType = PhysicsType::transparent;
-    w_i = (m < 0)? 0 : 1.0f/m;
-    f_final = Eigen::Vector3f(0.0f,0.0f,0.0f);
+    if (m == -1) physicsType = PhysicsType::Immovable;
+    else if (m == -2) physicsType = PhysicsType::Transparent;
+    w_i = (m < 0)? 0.0f : 1.0f/m;
+    f = Eigen::Vector3f(0.0f,0.0f,0.0f);
     p_pass  = Eigen::Vector3f(2.0f,2.0f,2.0f);
 }
 
@@ -219,5 +221,3 @@ void Object::update(const float deltatime)
         update = possitionCorrect();
     }
 }
-
-

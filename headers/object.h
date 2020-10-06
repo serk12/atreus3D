@@ -5,11 +5,16 @@
 #include <QEvent>
 #include "camera.h"
 
-enum SolverType  {euler = 0, semiEuler = 1, verlet = 2, rungeKuta2 = 3};
-enum PhysicsType {normal = 0, immovable = 1, transparent = 2};
+#define QTTYSHADERS 2
+
 class Object {
 
 public:
+    enum SolverType  {Euler = 0, SemiEuler = 1, Verlet = 2, RungeKuta2 = 3};
+    enum PhysicsType {Normal = 0, Immovable = 1, Transparent = 2};
+    enum ObjectType  {Mesh = 0, Particle = 1};
+    enum ShaderType  {Vanilla = 0, Sphere = 1};
+
     ~Object();
     virtual void render() const = 0;
     virtual void event(QEvent *event) = 0;
@@ -38,11 +43,14 @@ protected:
 
     // phisics variables
     inline static const float k_d = 0.975f;
+    inline static const float gravityScale = 0.00000000005f;
+    inline static const Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
-    Eigen::Vector3f p, p_pass, v, f_final;
+    Eigen::Vector3f p, p_pass, v, f;
     float w_i, m;
-    SolverType solverType = SolverType::euler;
-    PhysicsType physicsType = PhysicsType::normal;
+    SolverType  solverType  = SolverType::Euler;
+    PhysicsType physicsType = PhysicsType::Normal;
+    ObjectType  objectType;
 
     virtual void forceUpdate() = 0;
     virtual void collisionDetect() = 0;

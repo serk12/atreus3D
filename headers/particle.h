@@ -7,6 +7,7 @@
 class Particle : public Object {
 public:
     Particle();
+    Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     Particle(const unsigned int programIndex,const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     ~Particle();
 

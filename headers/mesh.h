@@ -7,6 +7,7 @@
 class Mesh : public Object {
 public:
     Mesh();
+    Mesh(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     Mesh(const std::vector<float> vertices, const std::vector<unsigned int> indices,const unsigned int programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const GLenum type);
     ~Mesh();
 
