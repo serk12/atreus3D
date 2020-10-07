@@ -26,6 +26,7 @@ public:
     static void deleteVanillas();
 
     void load();
+    virtual void isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const = 0;
 
 
 protected:
@@ -42,13 +43,13 @@ protected:
     void renderType(int type) const;
 
     // phisics variables
-    inline static const float k_d = 0.975f;
+    inline static const float k_d = 1.0f;
     inline static const float gravityScale = 0.03f;
     inline static const Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
     Eigen::Vector3f p, p_pass, v, f;
     float w_i, m;
-    SolverType  solverType  = SolverType::Euler;
+    SolverType  solverType  = SolverType::Verlet;
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
 

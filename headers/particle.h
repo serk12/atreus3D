@@ -13,6 +13,7 @@ public:
 
     void render() const final;
     void event(QEvent *event) final;
+    void isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const final;
 
 private:
     inline static const GLenum TYPE = GL_POINTS;

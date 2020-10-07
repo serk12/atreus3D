@@ -48,7 +48,7 @@ private:
     float width_, height_;
     bool initialized = false;
 
-    //objects = meshes,  particles
+    //objects = meshes, particles
     std::pair<std::list<Object*>, std::list<Object*> > objects;
 
 };

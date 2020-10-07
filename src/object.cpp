@@ -201,11 +201,12 @@ void Object::solver(const float dtMs)
         p = p + dt*v;
         break;
     case SolverType::Verlet:
-        p = p + k_d*(p-p_pass)+dt*(dt*(f*m));
+        p = p + k_d*(p-p_pass)+dt*(dt*(f*w_i));
+        v = (p - aux_p)/dt;
         break;
     case SolverType::RungeKuta2: //semiEuler for the moment
         v = v + dt*(w_i*f);
-        p = p + dt/2.0f * (v + v);
+        p = p + dt*(v+v)/2.0f;
         break;
     default:
         break;
@@ -220,16 +221,12 @@ void Object::initSolver()
     else if (m == -2) physicsType = PhysicsType::Transparent;
     w_i = (m < 0)? 0.0f : 1.0f/m;
     f = Eigen::Vector3f(0.0f,0.0f,0.0f);
-    p_pass  = Eigen::Vector3f(2.0f,2.0f,2.0f);
+    p_pass = p - (v * 0.016f);
 }
 
 void Object::update(const float deltatime, const std::list<Object*>& meshs)
 {
     forceUpdate();
     solver(deltatime);
-    bool update = true;
-    while (update) {
-        collisionDetect(meshs);
-        update = possitionCorrect();
-    }
+    collisionDetect(meshs);
 }

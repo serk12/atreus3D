@@ -25,6 +25,13 @@ GLWidget::~GLWidget()
 {
     cleanup();
     Object::deleteVanillas();
+    delete fpsTimer;
+    for (Object* &o : objects.first) {
+        delete o;
+    }
+    for (Object* &o : objects.second) {
+        delete o;
+    }
 }
 
 void GLWidget::cleanup()
@@ -39,8 +46,13 @@ void GLWidget::initializeGL()
     glewInit();
 
     glEnable(GL_NORMALIZE);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+
     glEnable(GL_DEPTH_TEST);
 
     bool no_problems = Object::vanillaProgramsLoad();
@@ -78,10 +90,11 @@ void GLWidget::paintGL()
         float dt = currentTime - previousTime;
         previousTime = currentTime;
 
+        //mesh
         for (Object* &o : objects.first) {
-            o->update(dt, objects.second);
             o->render();
         }
+        //particles
         for (Object* &o : objects.second) {
             o->update(dt, objects.first);
             o->render();

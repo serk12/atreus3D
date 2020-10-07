@@ -40,19 +40,15 @@ void Particle::forceUpdate()
     this->f = gravity*m;
 }
 
+void Particle::isColliding(Eigen::Vector3f&, Eigen::Vector3f&, Eigen::Vector3f&, const float) const
+{
+
+}
+
 void Particle::collisionDetect(const std::list<Object*>& meshs)
 {
-    if( p.x() < 0.0f) {
-        p.x() = 0.0f;
-        v.x() = -v.x();
-    }
-    if( p.y() < 0.0f) {
-        p.y() = 0.0f;
-        v.y() = -v.y();
-    }
-    if( p.z() < 0.0f) {
-        p.z() = 0.0f;
-        v.z() = -v.z();
+    for (Object* m : meshs){
+        m->isColliding(p, p_pass, v, r);
     }
 }
 

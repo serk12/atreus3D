@@ -11,34 +11,68 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     float rx = 0.75f;
     float ry = 0.3f;
     float rz = 0.75f;
-    std::vector<float> box = {
-         1.0f*rx,  1.0f*ry,  1.0f*rz,
-         1.0f*rx,  1.0f*ry, -1.0f*rz,
-         1.0f*rx, -1.0f*ry,  1.0f*rz,
-         1.0f*rx, -1.0f*ry, -1.0f*rz,
+    std::vector<float> box;
+//    std::vector<float> box = {
+//        1.0f*rx,  1.0f*ry,  1.0f*rz, // 0
+//        1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
+//        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+//        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+//                                     //
+//       -1.0f*rx,  1.0f*ry,  1.0f*rz, // 4
+//       -1.0f*rx,  1.0f*ry, -1.0f*rz, // 5
+//       -1.0f*rx, -1.0f*ry,  1.0f*rz, // 6
+//       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+//    };
 
-        -1.0f*rx,  1.0f*ry,  1.0f*rz,
-        -1.0f*rx,  1.0f*ry, -1.0f*rz,
-        -1.0f*rx, -1.0f*ry,  1.0f*rz,
-        -1.0f*rx, -1.0f*ry, -1.0f*rz,
-    };
-    std::vector<unsigned int> boxi = {
-        0,2,3,1,
-        0,4,
-        6,7,5,4,
-        6,7,
-        5,1,3,7,
-        5,4,
-        0,2,6,4,
-        0,2,
-        6,7,3,2,
-        0
-    };
+    box = {
+        -1.0f*rx, -1.0f*ry,  1.0f*rz, // 6
+        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+        };
 
-    Polygon *a = new Polygon(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f),Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    std::vector<unsigned int> boxi = {0,1,2,3};
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_LOOP);
     objects.first.push_back(a);
 
-    float r = 0.45f;
+    box = {
+            1.0f*rx,  1.0f*ry,  1.0f*rz, // 0
+            1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+           -1.0f*rx, -1.0f*ry,  1.0f*rz, // 6
+           -1.0f*rx,  1.0f*ry,  1.0f*rz, // 4
+        };
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    objects.first.push_back(a);
+
+    box = {
+       -1.0f*rx,  1.0f*ry, -1.0f*rz, // 5
+       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+        1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
+        };
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 0.5f, 1.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    objects.first.push_back(a);
+
+    box = {
+           -1.0f*rx, -1.0f*ry,  1.0f*rz, // 6
+           -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+           -1.0f*rx,  1.0f*ry, -1.0f*rz, // 5
+           -1.0f*rx,  1.0f*ry,  1.0f*rz, // 4
+        };
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.5f, 0.25f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    objects.first.push_back(a);
+
+    box = {
+            1.0f*rx,  1.0f*ry,  1.0f*rz, // 0
+            1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+            1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+            1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
+        };
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    objects.first.push_back(a);
+
+
+    float r = 1.45f;
     box = {
         0.0f*r, 0.5f*r, 0.0f*r,
         1.0f*r, 0.0f*r, 0.0f*r,
@@ -48,7 +82,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
         0,1,2,
         2,1,0,
     };
-    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(-0.25f, -0.25f, -0.25f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
+    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
     objects.first.push_back(t);
 
     Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1);
@@ -59,9 +93,9 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
 
-    for (int i = 1; i < 50; ++i) {
+    for (int i = 1; i < 10; ++i) {
         float rx = dis(gen), rz = dis(gen), ry = dis(gen);
-        Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f*ry, 0.0f), Eigen::Vector3f(0.3f*(rx-0.5f), 0.5f, 0.3f*(rz-0.5f)), 0.05f);
+        Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f*ry, 0.0f), Eigen::Vector3f(0.75f*(rx-0.5f), 0.5f, 0.75f*(rz-0.5f)), 0.05f);
         objects.second.push_back(b);
     }
     return true;
