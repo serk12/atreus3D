@@ -12,6 +12,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     float ry = 0.3f;
     float rz = 0.75f;
     std::vector<float> box;
+    std::vector<unsigned int> boxi;
 //    std::vector<float> box = {
 //        1.0f*rx,  1.0f*ry,  1.0f*rz, // 0
 //        1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
@@ -31,7 +32,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
        -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
         };
 
-    std::vector<unsigned int> boxi = {0,1,2,3};
+    boxi = {0,1,2,3};
     Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_LOOP);
     objects.first.push_back(a);
 
@@ -82,7 +83,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
         0,1,2,
         2,1,0,
     };
-    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
+    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(-0.75f, -0.50f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
     objects.first.push_back(t);
 
     Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1);
@@ -93,9 +94,10 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
 
-    for (int i = 1; i < 10; ++i) {
+    for (int i = 1; i < 1500; ++i) {
         float rx = dis(gen), rz = dis(gen), ry = dis(gen);
-        Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f*ry, 0.0f), Eigen::Vector3f(0.75f*(rx-0.5f), 0.5f, 0.75f*(rz-0.5f)), 0.05f);
+        //Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f, 0.0f), Eigen::Vector3f(0.75f*(rx-0.5f), 0.7f+0.2*(ry-0.5f), 0.75f*(rz-0.5f)), 0.05f);
+        Particle *b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
         objects.second.push_back(b);
     }
     return true;

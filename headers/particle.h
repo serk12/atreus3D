@@ -13,11 +13,11 @@ public:
 
     void render() const final;
     void event(QEvent *event) final;
-    void isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const final;
+    bool isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const final;
 
 private:
     inline static const GLenum TYPE = GL_POINTS;
-    float r = 0.025f;
+    inline static const float r = 0.025f;
 
     void forceUpdate() final;
     void collisionDetect(const std::list<Object*>& meshs) final;
