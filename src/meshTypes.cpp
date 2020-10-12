@@ -20,7 +20,7 @@ void calculateNormal(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const E
     }
 }
 
-inline bool planeCrossed(const Eigen::Vector3f& n, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const float d)
+inline bool planeCrossed(const Eigen::Vector3f& n, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const float d, const float r = 0.0f)
 {
     return (n.dot(p) + d) * (n.dot(p_pass) + d) <= 0.0f;
 }
@@ -50,9 +50,15 @@ float Sphere::getRadius() const
 
 bool Sphere::isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const
 {
-    Eigen::Vector3f diff_p = p - this->p;
-    if ((diff_p).transpose() * (diff_p) - (this->r*this->r) <= 0.01f) {
-        Eigen::Vector3f n = diff_p.normalized();
+    Eigen::Vector3f c = this->p;
+    Eigen::Vector3f diff_p = p - c;
+    if ((diff_p).transpose() * (diff_p) - ((this->r*this->r) - (r*r)) <= 0.0f) {
+        float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
+        float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
+        float dir1 = (-beta+aux_1)/(aux_2);
+        float dir2 = (-beta-aux_1)/(aux_2);
+        Eigen::Vector3f P = p + ((dir1 >= 0.0f)? dir2 : dir1)*v;
+        Eigen::Vector3f n = (P - c).normalized();
         float d = -(n.x()*p.x() + n.y()*p.y() + n.z()*p.z());
         correctParticle(p, v, p_pass, 0.95f, n, d);
     }
@@ -102,7 +108,7 @@ float Triangle::getRadius() const
 
 bool Triangle::isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const
 {
-    if(planeCrossed(n, p, p_pass, d) and (areaTrangle(p, B, C) + areaTrangle(A, p, C) + areaTrangle(A, B, p) - area <= 0.1f)) {
+    if(planeCrossed(n, p, p_pass, d, r) and (areaTrangle(p, B, C) + areaTrangle(A, p, C) + areaTrangle(A, B, p) - area <= 0.01f)) {
         correctParticle(p, v, p_pass, 0.95f, n, d);
         return true;
     }
@@ -144,7 +150,7 @@ float Plane::getRadius() const
 
 bool Plane::isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const
 {
-    if(planeCrossed(n, p, p_pass, d)) {
+    if(planeCrossed(n, p, p_pass, d, r)) {
         correctParticle(p, v, p_pass, 0.95f, n, d);
         return true;
     }

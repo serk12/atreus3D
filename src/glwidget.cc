@@ -12,13 +12,26 @@ const double kFieldOfView = 60;
 const double kZNear = 0.0001;
 const double kZFar = 10;
 
+#define LIVE_TiME 2000
+#define BIRD_TIME 100
+
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
     fpsTimer = new QTimer(this);
     connect(fpsTimer, SIGNAL(timeout()), this, SLOT(update()));
     fpsTimer->start(10);
+
+    liveTimer = new QTimer(this);
+    connect(liveTimer, SIGNAL(timeout()), this, SLOT(killParticle()));
+    liveTimer->start(LIVE_TiME);
+
+    birdTimer = new QTimer(this);
+    connect(birdTimer, SIGNAL(timeout()), this, SLOT(createParticle()));
+    birdTimer->start(BIRD_TIME);
+
     frameTime.start();
+
 }
 
 GLWidget::~GLWidget()
@@ -79,8 +92,22 @@ void GLWidget::updateFPS()
     }
 }
 
+void GLWidget::createParticles()
+{
+    for (int i = 0; i < toCreate; ++i) {
+        if (objects.second.size() < 1499) {
+            Simulation::addParticle(this->objects.second);
+            if (!liveTimer->isActive()) {
+                liveTimer->start(LIVE_TiME);
+            }
+        }
+    }
+    toCreate = 0;
+}
+
 void GLWidget::paintGL()
 {
+    createParticles();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -88,6 +115,7 @@ void GLWidget::paintGL()
         Object::cameraMatrixCalc(camera_);
         float currentTime = frameTime.elapsed();
         float dt = currentTime - previousTime;
+        dt = 16;
         previousTime = currentTime;
 
         //mesh
@@ -149,5 +177,22 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event) {
     }
 
     update();
+}
+
+void GLWidget::killParticle()
+{
+    if (this->objects.second.size() > 0) {
+        Object *a = this->objects.second.front();
+        this->objects.second.pop_front();
+        delete a;
+    }
+    else {
+        liveTimer->stop();
+    }
+}
+
+void GLWidget::createParticle()
+{
+    ++toCreate;
 }
 

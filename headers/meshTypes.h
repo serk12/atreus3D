@@ -14,6 +14,7 @@ public:
 
 private:
     float r = 0.25f;
+    float r2 = r*r;
 };
 
 

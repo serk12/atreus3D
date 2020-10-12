@@ -36,10 +36,11 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
+    void createParticles();
     //FPS limiter + counter
     void updateFPS();
     QElapsedTimer frameTime;
-    QTimer* fpsTimer;
+    QTimer *fpsTimer, *liveTimer, *birdTimer;
     float previousTime = 0.0f;
     int frameCounter = 0;
 
@@ -51,6 +52,12 @@ private:
     //objects = meshes, particles
     std::pair<std::list<Object*>, std::list<Object*> > objects;
 
+
+    int toCreate = 0;
+
+private slots:
+    void killParticle();
+    void createParticle();
 };
 
 

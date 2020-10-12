@@ -15,7 +15,7 @@ public:
     enum PhysicsType {Normal = 0, Immovable = 1, Transparent = 2};
     enum ShaderType  {Vanilla = 0, Sphere = 1};
 
-    ~Object();
+    virtual ~Object();
     virtual void render() const = 0;
     virtual void event(QEvent *event) = 0;
 

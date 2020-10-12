@@ -89,16 +89,21 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1);
     objects.first.push_back(s);
 
+    for (int i = 0; i < 0; ++i) {
+        Simulation::addParticle(objects.second);
+    }
+    return true;
+}
 
+void Simulation::addParticle(std::list<Object*>& particleList)
+{
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
-
-    for (int i = 1; i < 1500; ++i) {
-        float rx = dis(gen), rz = dis(gen), ry = dis(gen);
-        //Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.2f, 0.0f), Eigen::Vector3f(0.75f*(rx-0.5f), 0.7f+0.2*(ry-0.5f), 0.75f*(rz-0.5f)), 0.05f);
-        Particle *b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
-        objects.second.push_back(b);
-    }
-    return true;
+    float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
+    Particle *b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f), Eigen::Vector3f(0.1f*rx, 0.5f, 0.1f*rz), 0.05f);
+    //Particle *b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
+    //Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
+    b->load();
+    particleList.push_back(b);
 }
