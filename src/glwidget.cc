@@ -12,7 +12,7 @@ const double kFieldOfView = 60;
 const double kZNear = 0.0001;
 const double kZFar = 10;
 
-#define LIVE_TiME 2000
+#define LIVE_TiME 3000
 #define BIRD_TIME 100
 
 GLWidget::GLWidget(QWidget *parent)
@@ -193,6 +193,8 @@ void GLWidget::killParticle()
 
 void GLWidget::createParticle()
 {
-    ++toCreate;
+    if (objects.second.size() < MAX_PARTICLES) {
+        ++toCreate;
+    }
 }
 

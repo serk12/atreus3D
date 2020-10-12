@@ -8,12 +8,14 @@
 class Particle : public Object {
 public:
     Particle();
-    Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
-    Particle(const ShaderType programIndex,const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
+    Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u);
+    Particle(const ShaderType programIndex,const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u);
 
     void render() const final;
     void event(QEvent *event) final;
-    bool isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const final;
+    bool isColliding(Object& object) const final;
+    float getRadius() const final;
+    void correctParticle(const Eigen::Vector3f& n, const float d) final;
 
 private:
     inline static const GLenum TYPE = GL_POINTS;
@@ -23,7 +25,6 @@ private:
     void collisionDetect(const std::list<Object*>& meshs) final;
     bool possitionCorrect() final;
 
-    float getRadius() const final;
 };
 
 #endif // PARTICLE_H

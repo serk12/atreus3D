@@ -26,7 +26,18 @@ public:
     static void deleteVanillas();
 
     void load();
-    virtual bool isColliding(Eigen::Vector3f& p, Eigen::Vector3f& p_pass, Eigen::Vector3f& v, const float r) const = 0;
+    virtual bool isColliding(Object& object) const = 0;
+
+    virtual void correctParticle(const Eigen::Vector3f& n, const float d) = 0;
+
+    virtual float getRadius() const = 0;
+    float getWeight() const;
+    float getIWeight() const;
+    float getElasticity() const;
+    float getFriction() const;
+    Eigen::Vector3f getPosition() const;
+    Eigen::Vector3f getPassPosition() const;
+    Eigen::Vector3f getVelocity() const;
 
 
 protected:
@@ -48,7 +59,7 @@ protected:
     inline static const Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
     Eigen::Vector3f p, p_pass, v, f;
-    float w_i, m;
+    float w_i, m, e, u;
     SolverType  solverType  = SolverType::SemiEuler;
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
@@ -56,7 +67,6 @@ protected:
     virtual void forceUpdate() = 0;
     virtual void collisionDetect(const std::list<Object*>& objects) = 0;
     virtual bool possitionCorrect() = 0;
-    virtual float getRadius() const = 0;
     void solver(const float dt);
     void initSolver();
 

@@ -220,7 +220,7 @@ void Object::initSolver()
     if (m == -1) physicsType = PhysicsType::Immovable;
     else if (m == -2) physicsType = PhysicsType::Transparent;
     w_i = (m < 0)? 0.0f : 1.0f/m;
-    f = Eigen::Vector3f(0.0f,0.0f,0.0f);
+    f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
     p_pass = p - (v * 0.016f);
 }
 
@@ -230,3 +230,39 @@ void Object::update(const float deltatime, const std::list<Object*>& meshs)
     solver(deltatime);
     collisionDetect(meshs);
 }
+
+float Object::getWeight() const
+{
+    return m;
+}
+
+float Object::getIWeight() const
+{
+    return w_i;
+}
+
+float Object::getElasticity() const
+{
+    return e;
+}
+
+float Object::getFriction() const
+{
+    return u;
+}
+
+Eigen::Vector3f Object::getPosition() const
+{
+    return p;
+}
+
+Eigen::Vector3f Object::getPassPosition() const
+{
+    return p_pass;
+}
+
+Eigen::Vector3f Object::getVelocity() const
+{
+    return v;
+}
+

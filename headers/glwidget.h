@@ -36,6 +36,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
+    inline static const int MAX_PARTICLES = 50;
     void createParticles();
     //FPS limiter + counter
     void updateFPS();

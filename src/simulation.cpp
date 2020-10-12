@@ -33,7 +33,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
         };
 
     boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_LOOP);
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
     box = {
@@ -42,7 +42,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
            -1.0f*rx, -1.0f*ry,  1.0f*rz, // 6
            -1.0f*rx,  1.0f*ry,  1.0f*rz, // 4
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
     box = {
@@ -51,7 +51,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
         1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
         1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 0.5f, 1.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 0.5f, 1.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
     box = {
@@ -60,7 +60,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
            -1.0f*rx,  1.0f*ry, -1.0f*rz, // 5
            -1.0f*rx,  1.0f*ry,  1.0f*rz, // 4
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.5f, 0.25f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.5f, 0.25f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
     box = {
@@ -69,7 +69,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
             1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
             1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
 
@@ -86,12 +86,9 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(-0.75f, -0.50f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
     objects.first.push_back(t);
 
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1);
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
     objects.first.push_back(s);
 
-    for (int i = 0; i < 0; ++i) {
-        Simulation::addParticle(objects.second);
-    }
     return true;
 }
 
@@ -101,7 +98,7 @@ void Simulation::addParticle(std::list<Object*>& particleList)
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
     float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
-    Particle *b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f), Eigen::Vector3f(0.1f*rx, 0.5f, 0.1f*rz), 0.05f);
+    Particle *b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f), Eigen::Vector3f(0.1f*rx, 0.5f, 0.1f*rz), 0.05f, 0.95f, 0.80f);
     //Particle *b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
     //Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
     b->load();
