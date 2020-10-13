@@ -231,6 +231,14 @@ void Object::update(const float deltatime, const std::list<Object*>& meshs)
     collisionDetect(meshs);
 }
 
+void Object::correctParticle(const Eigen::Vector3f& n, const float d)
+{
+    Eigen::Vector3f vt = v - ((n.dot(v)) * n);
+    v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
+    p = p - (1.0f + e) * (n.dot(p)+d) * n;
+    p_pass = p - (v * 0.016f);
+}
+
 float Object::getWeight() const
 {
     return m;
@@ -264,5 +272,10 @@ Eigen::Vector3f Object::getPassPosition() const
 Eigen::Vector3f Object::getVelocity() const
 {
     return v;
+}
+
+void Object::setSolverModel(SolverType solverType)
+{
+    Object::solverType = solverType;
 }
 

@@ -15,12 +15,14 @@ public:
     void event(QEvent *event) final;
     bool isColliding(Object& object) const final;
     float getRadius() const final;
-    void correctParticle(const Eigen::Vector3f& n, const float d) final;
 
 private:
     inline static const GLenum TYPE = GL_POINTS;
-    inline static const float r = 0.025f;
+    inline static const float r = 0.0175f;
 
+    std::list<Particle*> links;
+    std::list<float> linksDistance;
+    float k_e, k_d;
     void forceUpdate() final;
     void collisionDetect(const std::list<Object*>& meshs) final;
     bool possitionCorrect() final;

@@ -40,5 +40,3 @@ void Mesh::forceUpdate() {}
 void Mesh::collisionDetect(const std::list<Object*>&) {}
 
 bool Mesh::possitionCorrect() {return false;}
-
-void Mesh::correctParticle(const Eigen::Vector3f&, const float) {}

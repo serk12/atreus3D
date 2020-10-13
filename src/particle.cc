@@ -40,6 +40,14 @@ void Particle::event(QEvent *) {}
 void Particle::forceUpdate()
 {
     this->f = gravity*m;
+    std::list<float>::iterator itDis = linksDistance.begin();
+    for (std::list<Particle*>::iterator it = links.begin(); it != links.end(); ++it, ++itDis) {
+        Particle* l = *it;
+        float dis = *itDis;
+        Eigen::Vector3f diff = p - l->p;
+        Eigen::Vector3f direction = diff.normalized();
+        f += (k_e * ((diff).norm() - dis) + k_d * (v - l->v).dot(direction)) * direction;
+    }
 }
 
 bool Particle::isColliding(Object &) const
@@ -55,11 +63,3 @@ void Particle::collisionDetect(const std::list<Object*>& meshs)
 }
 
 bool Particle::possitionCorrect() {return false;}
-
-void Particle::correctParticle(const Eigen::Vector3f& n, const float d)
-{
-    Eigen::Vector3f vt = v - ((n.dot(v)) * n);
-    v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
-    p = p - (1.0f + e) * (n.dot(p)+d) * n;
-    p_pass = p - (v * 0.016f);
-}

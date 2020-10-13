@@ -12,7 +12,6 @@ public:
 
     void render() const final;
     void event(QEvent *event) final;
-    void correctParticle(const Eigen::Vector3f& n, const float d) final;
 
 private:
     GLenum type;

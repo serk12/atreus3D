@@ -36,12 +36,12 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    inline static const int MAX_PARTICLES = 50;
     void createParticles();
     //FPS limiter + counter
     void updateFPS();
     QElapsedTimer frameTime;
-    QTimer *fpsTimer, *liveTimer, *birdTimer;
+    QTimer *fpsTimer, *birdTimer;
+    std::list<QTimer*> lifeTimer;
     float previousTime = 0.0f;
     int frameCounter = 0;
 

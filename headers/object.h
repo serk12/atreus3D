@@ -28,7 +28,7 @@ public:
     void load();
     virtual bool isColliding(Object& object) const = 0;
 
-    virtual void correctParticle(const Eigen::Vector3f& n, const float d) = 0;
+    void correctParticle(const Eigen::Vector3f& n, const float d);
 
     virtual float getRadius() const = 0;
     float getWeight() const;
@@ -38,6 +38,8 @@ public:
     Eigen::Vector3f getPosition() const;
     Eigen::Vector3f getPassPosition() const;
     Eigen::Vector3f getVelocity() const;
+
+    static void setSolverModel(SolverType solverType);
 
 
 protected:
@@ -55,12 +57,12 @@ protected:
 
     // phisics variables
     inline static const float k_d = 1.0f;
-    inline static const float gravityScale = 0.03f;
+    inline static const float gravityScale = 0.35f;
     inline static const Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
     Eigen::Vector3f p, p_pass, v, f;
     float w_i, m, e, u;
-    SolverType  solverType  = SolverType::SemiEuler;
+    inline static SolverType solverType = SolverType::Verlet;
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
 
@@ -71,7 +73,7 @@ protected:
     void initSolver();
 
 private:
-    inline static Eigen::Vector3f lightColor = Eigen::Vector3f(1.0f, 1.0f, 1.0f);;
+    inline static Eigen::Vector3f lightColor = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
 
 };
 

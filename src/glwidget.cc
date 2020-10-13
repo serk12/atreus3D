@@ -12,9 +12,6 @@ const double kFieldOfView = 60;
 const double kZNear = 0.0001;
 const double kZFar = 10;
 
-#define LIVE_TiME 3000
-#define BIRD_TIME 100
-
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
@@ -22,13 +19,9 @@ GLWidget::GLWidget(QWidget *parent)
     connect(fpsTimer, SIGNAL(timeout()), this, SLOT(update()));
     fpsTimer->start(10);
 
-    liveTimer = new QTimer(this);
-    connect(liveTimer, SIGNAL(timeout()), this, SLOT(killParticle()));
-    liveTimer->start(LIVE_TiME);
-
     birdTimer = new QTimer(this);
     connect(birdTimer, SIGNAL(timeout()), this, SLOT(createParticle()));
-    birdTimer->start(BIRD_TIME);
+    birdTimer->start(Simulation::birdTime);
 
     frameTime.start();
 
@@ -70,7 +63,8 @@ void GLWidget::initializeGL()
 
     bool no_problems = Object::vanillaProgramsLoad();
     if (! no_problems) exit(0);
-    Simulation::loadSim(objects);
+    Simulation::loadSim(objects, Simulation::ScenaryType::Cascade);
+    Object::setSolverModel(Simulation::solverType);
     for (Object* &o : objects.first) {
         o->load();
     }
@@ -94,12 +88,13 @@ void GLWidget::updateFPS()
 
 void GLWidget::createParticles()
 {
-    for (int i = 0; i < toCreate; ++i) {
-        if (objects.second.size() < 1499) {
+    if (objects.second.size() < Simulation::maxParticles) {
+        for (int i = 0; i < toCreate; ++i) {
             Simulation::addParticle(this->objects.second);
-            if (!liveTimer->isActive()) {
-                liveTimer->start(LIVE_TiME);
-            }
+            QTimer *liveTimer = new QTimer(this);
+            connect(liveTimer, SIGNAL(timeout()), this, SLOT(killParticle()));
+            liveTimer->start(Simulation::liveTime);
+            lifeTimer.push_back(liveTimer);
         }
     }
     toCreate = 0;
@@ -185,15 +180,18 @@ void GLWidget::killParticle()
         Object *a = this->objects.second.front();
         this->objects.second.pop_front();
         delete a;
+        QTimer *liveTimer = lifeTimer.front();
+        delete liveTimer;
+        lifeTimer.pop_front();
     }
     else {
-        liveTimer->stop();
+        lifeTimer.clear();
     }
 }
 
 void GLWidget::createParticle()
 {
-    if (objects.second.size() < MAX_PARTICLES) {
+    if (objects.second.size() + toCreate < Simulation::maxParticles) {
         ++toCreate;
     }
 }

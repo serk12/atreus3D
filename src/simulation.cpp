@@ -6,8 +6,7 @@
 #include <random>
 #include <iostream>
 
-bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects)
-{
+bool CubeScene(std::pair<std::list<Object*>, std::list<Object*> >& objects) {
     float rx = 0.75f;
     float ry = 0.3f;
     float rz = 0.75f;
@@ -92,15 +91,42 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     return true;
 }
 
+
+bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects, ScenaryType type)
+{
+    switch (type) {
+    case ScenaryType::Cascade:
+    case ScenaryType::Fountain:
+    case ScenaryType::Debug:
+    case ScenaryType::Rain:
+    default:
+        Simulation::scenaryType = type;
+        return CubeScene(objects);
+        break;
+    }
+}
+
 void Simulation::addParticle(std::list<Object*>& particleList)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
     float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
-    Particle *b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f), Eigen::Vector3f(0.1f*rx, 0.5f, 0.1f*rz), 0.05f, 0.95f, 0.80f);
-    //Particle *b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
-    //Particle *b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f);
+    Particle *b;
+    switch (Simulation::scenaryType) {
+    case ScenaryType::Cascade:
+        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(0.6f*rx, 1.0f, 0.6f*rz), 0.05f, 0.95f, 0.80f);
+        break;
+    case ScenaryType::Fountain:
+        b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f, 0.95f, 0.80f);
+        break;
+    case ScenaryType::Debug:
+        b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f, 0.95f, 0.80f);
+        break;
+    default:
+        b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f, 0.95f, 0.80f);
+        break;
+    }
     b->load();
     particleList.push_back(b);
 }
