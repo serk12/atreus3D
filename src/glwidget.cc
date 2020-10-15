@@ -63,7 +63,7 @@ void GLWidget::initializeGL()
 
     bool no_problems = Object::vanillaProgramsLoad();
     if (! no_problems) exit(0);
-    Simulation::loadSim(objects, Simulation::ScenaryType::Cascade);
+    Simulation::loadSim(objects, Simulation::scenaryType);
     Object::setSolverModel(Simulation::solverType);
     for (Object* &o : objects.first) {
         o->load();
@@ -110,7 +110,7 @@ void GLWidget::paintGL()
         Object::cameraMatrixCalc(camera_);
         float currentTime = frameTime.elapsed();
         float dt = currentTime - previousTime;
-        dt = 16;
+        dt = 1;
         previousTime = currentTime;
 
         //mesh

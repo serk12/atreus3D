@@ -10,10 +10,10 @@ public:
     static bool loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects, ScenaryType type);
     static void addParticle(std::list<Object*>& particleList);
 
-    inline static ScenaryType scenaryType = ScenaryType::Cascade;
-    inline static Object::SolverType solverType = Object::SolverType::Verlet;
-    inline static unsigned int liveTime = 1000;
-    inline static unsigned int birdTime = 10;
+    inline static ScenaryType scenaryType = ScenaryType::String;
+    inline static Object::SolverType solverType = Object::SolverType::SemiEuler;
+    inline static unsigned int liveTime = 10000000;
+    inline static unsigned int birdTime = 10000000;
     inline static unsigned int maxParticles = 10;
 };
 

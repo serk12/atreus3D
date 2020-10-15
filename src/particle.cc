@@ -8,7 +8,7 @@ Particle::Particle() : Particle(ShaderType::Sphere, Eigen::Vector3f(0.2f, 0.6f, 
 
 Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u) {}
 
-Particle::Particle(const ShaderType programIndex,const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
+Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
 {
     this->shaderType = programIndex;
     this->objectColor = color;
@@ -25,6 +25,26 @@ Particle::Particle(const ShaderType programIndex,const Eigen::Vector3f color, co
     initSolver();
 }
 
+Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
+                   const std::list<Particle*> links, const std::list<float> linksDistance) : Particle(programIndex, color, p, v, m, e, u)
+{
+    this->links = std::list<Particle*>(links);
+    this->linksDistance = std::list<float>(linksDistance);
+}
+Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
+                   const std::list<Particle*> links, const std::list<float> linksDistance) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u)
+{
+    this->links = std::list<Particle*>(links);
+    this->linksDistance = std::list<float>(linksDistance);
+}
+
+
+void Particle::addParticle(Particle* &p, const float distance)
+{
+    links.push_back(p);
+    linksDistance.push_back(distance);
+}
+
 float Particle::getRadius() const
 {
     return r;
@@ -35,19 +55,30 @@ void Particle::render() const
     renderType(Particle::TYPE);
 }
 
+
 void Particle::event(QEvent *) {}
 
 void Particle::forceUpdate()
 {
-    this->f = gravity*m;
-    std::list<float>::iterator itDis = linksDistance.begin();
-    for (std::list<Particle*>::iterator it = links.begin(); it != links.end(); ++it, ++itDis) {
-        Particle* l = *it;
-        float dis = *itDis;
-        Eigen::Vector3f diff = p - l->p;
-        Eigen::Vector3f direction = diff.normalized();
-        f += (k_e * ((diff).norm() - dis) + k_d * (v - l->v).dot(direction)) * direction;
+    if (physicsType == PhysicsType::Normal) {
+        f = gravity*m;
+        std::list<float>::iterator itDis = linksDistance.begin();
+        for (std::list<Particle*>::iterator it = links.begin(); it != links.end(); ++it, ++itDis) {
+            Particle* l = *it;
+            float dis = *itDis;
+            Eigen::Vector3f diff = p - l->p;
+            Eigen::Vector3f diffV = v - l->v;
+            diffV.x() = abs(diffV.x());
+            diffV.y() = abs(diffV.y());
+            diffV.z() = abs(diffV.z());
+            Eigen::Vector3f direction = diff.normalized();
+            f += (k_e * (diff.norm() - dis) + k_d * diffV.dot(direction)) * direction;
+        }
     }
+    else {
+        f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+    }
+
 }
 
 bool Particle::isColliding(Object &) const

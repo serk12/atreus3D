@@ -226,9 +226,9 @@ void Object::initSolver()
 
 void Object::update(const float deltatime, const std::list<Object*>& meshs)
 {
-    forceUpdate();
     solver(deltatime);
     collisionDetect(meshs);
+    forceUpdate();
 }
 
 void Object::correctParticle(const Eigen::Vector3f& n, const float d)

@@ -57,7 +57,7 @@ protected:
 
     // phisics variables
     inline static const float k_d = 1.0f;
-    inline static const float gravityScale = 0.35f;
+    inline static const float gravityScale = 0.0f;
     inline static const Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
     Eigen::Vector3f p, p_pass, v, f;

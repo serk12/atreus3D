@@ -91,18 +91,49 @@ bool CubeScene(std::pair<std::list<Object*>, std::list<Object*> >& objects) {
     return true;
 }
 
+bool stringScene(std::pair<std::list<Object*>, std::list<Object*> >&objects)
+{
+    float rx = 0.75f;
+    float ry = 0.3f;
+    float rz = 0.75f;
+    std::vector<float> box;
+    std::vector<unsigned int> boxi;
+    box = {
+        -1.0f*rx, -1.0f*ry,  1.0f*rz, // 6
+        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+        };
+
+    boxi = {0,1,2,3};
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -2, 0.95f, 0.80f,  GL_LINE_LOOP);
+    objects.first.push_back(a);
+
+    Particle* aux = new Particle(Eigen::Vector3f(0.0f, 0.5f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, 0.95f, 0.80f);
+    objects.second.push_back(aux);
+    for (int i = 1; i < 4; ++i) {
+        Particle* c = new Particle(Eigen::Vector3f(0.0f, 0.5f - 0.1f*i, 0.0f), Eigen::Vector3f(0.1f*i,0.1f*i,0.1f*i), 0.2f, 0.95f, 0.80f);
+        objects.second.push_back(c);
+        c->addParticle(aux, 1.5f);
+        aux->addParticle(c, 1.5f);
+        aux = c;
+    }
+    return true;
+}
+
 
 bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects, ScenaryType type)
 {
+    Simulation::scenaryType = type;
     switch (type) {
+    case ScenaryType::String:
+        return stringScene(objects);
     case ScenaryType::Cascade:
     case ScenaryType::Fountain:
     case ScenaryType::Debug:
     case ScenaryType::Rain:
     default:
-        Simulation::scenaryType = type;
         return CubeScene(objects);
-        break;
     }
 }
 

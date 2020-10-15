@@ -55,6 +55,7 @@ float Sphere::getRadius() const
 
 bool Sphere::isColliding(Object &object) const
 {
+    if (physicsType == PhysicsType::Transparent) return false;
     Eigen::Vector3f p = object.getPosition();
     Eigen::Vector3f v = object.getVelocity();
     Eigen::Vector3f c = this->p;
@@ -115,7 +116,8 @@ float Triangle::getRadius() const
 
 bool Triangle::isColliding(Object &object) const
 {
-    if(planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and (areaTrangle(object.getPosition(), B, C) + areaTrangle(A, object.getPosition(), C) + areaTrangle(A, B, object.getPosition()) - area <= 0.01f)) {
+    if (physicsType == PhysicsType::Transparent) return false;
+    if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and (areaTrangle(object.getPosition(), B, C) + areaTrangle(A, object.getPosition(), C) + areaTrangle(A, B, object.getPosition()) - area <= 0.01f)) {
         object.correctParticle(n, d);
         return true;
     }
@@ -157,6 +159,7 @@ float Plane::getRadius() const
 
 bool Plane::isColliding(Object &object) const
 {
+    if (physicsType == PhysicsType::Transparent) return false;
     if(planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius())) {
         object.correctParticle(n, d);
         return true;
@@ -182,5 +185,7 @@ float Polygon::getRadius() const
 
 bool Polygon::isColliding(Object &) const
 {
+
+    if (physicsType == PhysicsType::Transparent) return false;
     return false;
 }
