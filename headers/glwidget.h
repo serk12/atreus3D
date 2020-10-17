@@ -25,6 +25,7 @@ public:
 
     void cleanScenary();
     void loadScenary();
+    void setBirthTime(int value);
 
 public slots:
     void cleanup();

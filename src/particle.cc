@@ -70,13 +70,8 @@ void Particle::forceUpdate()
             float dis = *itDis;
             Eigen::Vector3f diff = p - l->p;
             Eigen::Vector3f diffV = v - l->v;
-//            diffV.x() = diffV.x() * v.x() < 0? diffV.x() : -diffV.x();
-//            diffV.y() = diffV.y() * v.y() < 0? diffV.y() : -diffV.y();
-//            diffV.z() = diffV.z() * v.z() < 0? diffV.z() : -diffV.z();
             Eigen::Vector3f direction = diff.normalized();
             f -= (k_e * (diff.norm() - dis) + (k_d * diffV.dot(direction))) * direction;
-//            std::cout << "F:" << f << std::endl;
-//            std::cout << std::endl << "NORM:" << diff.norm() << std::endl << "DIS:" << dis << std::endl;
         }
     }
     else {

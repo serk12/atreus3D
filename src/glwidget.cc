@@ -211,8 +211,7 @@ void GLWidget::cleanScenary()
 
 
 void GLWidget::loadScenary() {
-    Simulation::loadSim(objects, Simulation::scenaryType);
-    Object::setSolverModel(Simulation::solverType);
+    Simulation::loadSim(objects);
     for (Object* &o : objects.first) {
         o->load();
     }
@@ -220,4 +219,8 @@ void GLWidget::loadScenary() {
         o->load();
     }
     initialized = true;
+}
+
+void GLWidget::setBirthTime(int value) {
+    birdTimer->start(value);
 }

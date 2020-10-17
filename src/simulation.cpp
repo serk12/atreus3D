@@ -12,6 +12,25 @@ Simulation::Simulation(QWidget *parent)
     , ui(new Ui::Simulation)
 {
     ui->setupUi(this);
+    ui->SolverMethod->insertItem(ui->SolverMethod->count(), "Euler", Object::SolverType::Euler);
+    ui->SolverMethod->insertItem(ui->SolverMethod->count(), "SemiEuler", Object::SolverType::SemiEuler);
+    ui->SolverMethod->insertItem(ui->SolverMethod->count(), "Verlet", Object::SolverType::Verlet);
+
+    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Cascade", ScenaryType::Cascade);
+    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Rain", ScenaryType::Rain);
+    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Fountain", ScenaryType::Fountain);
+    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "String", ScenaryType::String);
+    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Debug", ScenaryType::Debug);
+    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Debug String", ScenaryType::DebugS);
+
+    ui->BirdTime->setValue(Simulation::birdTime);
+    ui->Kd->setValue(Simulation::k_d*100);
+    ui->LiveTime->setValue(Simulation::liveTime);
+    ui->TopParticles->setValue(Simulation::maxParticles);
+    ui->GravityScale->setValue(Simulation::gravityScale*100);
+
+    ui->SolverMethod->setCurrentIndex(int(Simulation::solverType));
+    ui->ScenaryType->setCurrentIndex(int(Simulation::scenaryType));
 }
 
 Simulation::~Simulation()
@@ -123,13 +142,16 @@ bool stringScene(std::pair<std::list<Object*>, std::list<Object*> >&objects)
     Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
+    objects.first.push_back(s);
+
     Particle* aux = new Particle(Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, 0.95f, 3.80f);
     objects.second.push_back(aux);
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
     float r = dis(gen)-0.5f;
-    float d = 0.01f;
+    float d = 0.000001f;
     int qttyPar = 10;
     for (int i = 1; i < qttyPar; ++i) {
         Particle* c = new Particle(Eigen::Vector3f(0.0f - 0.2f*i, 0.0f, 0.0f),
@@ -149,19 +171,28 @@ bool stringScene(std::pair<std::list<Object*>, std::list<Object*> >&objects)
 }
 
 
-bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects, ScenaryType type)
+bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects)
 {
-    Simulation::scenaryType = type;
-    switch (type) {
+
+    Object::setSolverModel(Simulation::solverType);
+    Object::setKd(Simulation::k_d);
+    Object::setGravityScale(Simulation::gravityScale);
+    bool result;
+    switch (Simulation::scenaryType) {
+    case ScenaryType::DebugS:
     case ScenaryType::String:
-        return stringScene(objects);
+        Simulation::liveTime = 1000000000;
+        result = stringScene(objects);
+        break;
     case ScenaryType::Cascade:
     case ScenaryType::Fountain:
     case ScenaryType::Debug:
     case ScenaryType::Rain:
     default:
-        return CubeScene(objects);
+        result = CubeScene(objects);
+        break;
     }
+    return result;
 }
 
 void Simulation::addParticle(std::list<Object*>& particleList)
@@ -196,22 +227,73 @@ void Simulation::addParticle(std::list<Object*>& particleList)
 
 void Simulation::on_GravityScale_valueChanged(int value)
 {
-    Object::setGravityScale(value/100.0f);
+    std::string text = "Gravity Scale: " + std::to_string(value) + "%";
+    ui->GravityScaleLab->setText(QString::fromUtf8(text.c_str()));
+    Simulation::gravityScale = value/100.0f;
+    Object::setGravityScale(Simulation::gravityScale);
+}
+
+std::string int2string(int value, int n = 3)
+{
+    std::ostringstream out;
+    out.precision(n);
+    float div = 10.0f;
+    for (int i = 1; i < n; ++i){
+        div *= 10.0f;
+    }
+    out << std::fixed << value/div;
+    return out.str();
 }
 
 
 void Simulation::on_TopParticles_valueChanged(int value)
 {
+    std::string text = "Birth Time: #" + std::to_string(value);
+    ui->MaxParticleLab->setText(QString::fromUtf8(text.c_str()));
     Simulation::maxParticles = value;
 }
 
 void Simulation::on_BirdTime_valueChanged(int value)
 {
+    std::string text = "Birth Time: " + int2string(value) + "s";
+    ui->BirthTimeLab->setText(QString::fromUtf8(text.c_str()));
     Simulation::birdTime = value;
+    ui->openGLWidget->setBirthTime(value);
 }
 
 
 void Simulation::on_LiveTime_valueChanged(int value)
 {
+    std::string text = "Live Time: " + int2string(value) + "s";
+    ui->LiveTimeLab->setText(QString::fromUtf8(text.c_str()));
     Simulation::liveTime = value;
 }
+
+void Simulation::on_Kd_valueChanged(int value)
+{
+    std::string text = "k_d: " + int2string(value, 2);
+    ui->KdLab->setText(QString::fromUtf8(text.c_str()));
+    Simulation::k_d = value/100.0f;
+    Object::setKd(Simulation::k_d);
+}
+
+void Simulation::on_ScenaryType_currentIndexChanged(int index)
+{
+    if (initiated > 1) {
+        Simulation::scenaryType = static_cast<ScenaryType>(index);
+        ui->openGLWidget->cleanScenary();
+        usleep(1000000);
+        ui->openGLWidget->loadScenary();
+    }
+    else{
+        ++initiated;
+    }
+}
+
+
+void Simulation::on_SolverMethod_currentIndexChanged(int index)
+{
+    Simulation::solverType = static_cast<Object::SolverType>(index);
+    Object::setSolverModel(solverType);
+}
+

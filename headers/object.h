@@ -11,8 +11,8 @@
 class Object {
 
 public:
-    enum SolverType  {Euler = 0, SemiEuler = 1, Verlet = 2, RungeKuta2 = 3};
-    enum PhysicsType {Normal = 0, Immovable = 1, Transparent = 2};
+    enum SolverType  {Euler, SemiEuler, Verlet, RungeKuta2};
+    enum PhysicsType {Normal, Immovable, Transparent};
     enum ShaderType  {Vanilla = 0, Sphere = 1};
 
     virtual ~Object();
@@ -42,6 +42,7 @@ public:
 
     static void setSolverModel(const SolverType solverType);
     static void setGravityScale(const float scale);
+    static void setKd(float kd);
 
 protected:
     // openGL basic shaders and render vars
@@ -57,13 +58,13 @@ protected:
     void renderType(int type) const;
 
     // phisics variables
-    inline static const float k_d = 0.95f;
+    inline static float k_d;
     inline static float gravityScale = 1.0f;
     inline static Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
     Eigen::Vector3f p, p_pass, v, v_pass, f;
     float w_i, m, e, u;
-    inline static SolverType solverType = SolverType::SemiEuler;
+    inline static SolverType solverType;
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
 

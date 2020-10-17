@@ -286,3 +286,8 @@ void Object::setGravityScale(const float scale)
     Object::gravity = Object::gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 }
 
+void Object::setKd(float kd)
+{
+    Object::k_d = kd;
+}
+

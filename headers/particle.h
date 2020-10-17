@@ -31,7 +31,7 @@ private:
 
     std::list<Particle*> links;
     std::list<float> linksDistance;
-    float k_e = 15.60f, k_d = 2.30f;
+    float k_e = 17.60f, k_d = 2.30f;
     void forceUpdate() final;
     void collisionDetect(const std::list<Object*>& meshs) final;
     bool possitionCorrect() final;
