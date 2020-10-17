@@ -58,9 +58,10 @@ bool Sphere::isColliding(Object &object) const
     if (physicsType == PhysicsType::Transparent) return false;
     Eigen::Vector3f p = object.getPosition();
     Eigen::Vector3f v = object.getVelocity();
+    float r2o = object.getRadius() * object.getRadius();
     Eigen::Vector3f c = this->p;
     Eigen::Vector3f diff_p = p - c;
-    if ((diff_p).transpose() * (diff_p) - ((this->r*this->r) - (r*r)) <= 0.0f) {
+    if ((diff_p.transpose() * diff_p) - (this->r2 - r2o) <= 0.0f) {
         float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
         float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
         float dir1 = (-beta+aux_1)/(aux_2);

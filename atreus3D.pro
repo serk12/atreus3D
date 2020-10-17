@@ -12,7 +12,6 @@ SOURCES += \
     src/camera.cc \
     src/glwidget.cc \
     src/main.cpp \
-    src/mainwindow.cpp \
     src/fpscount.cpp \
     src/mesh.cc \
     src/meshTypes.cpp \
@@ -28,7 +27,6 @@ HEADERS += \
     headers/camera.h \
     headers/fpscount.h \
     headers/glwidget.h \
-    headers/mainwindow.h \
     headers/mesh.h \
     headers/meshTypes.h \
     headers/object.h \

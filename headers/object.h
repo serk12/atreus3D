@@ -20,6 +20,7 @@ public:
     virtual void event(QEvent *event) = 0;
 
     void update(const float deltatime, const std::list<Object*>& meshs);
+    virtual void forceUpdate() = 0;
 
     static void cameraMatrixCalc(data_visualization::Camera camera_);
     static bool vanillaProgramsLoad();
@@ -39,8 +40,8 @@ public:
     Eigen::Vector3f getPassPosition() const;
     Eigen::Vector3f getVelocity() const;
 
-    static void setSolverModel(SolverType solverType);
-
+    static void setSolverModel(const SolverType solverType);
+    static void setGravityScale(const float scale);
 
 protected:
     // openGL basic shaders and render vars
@@ -56,17 +57,16 @@ protected:
     void renderType(int type) const;
 
     // phisics variables
-    inline static const float k_d = 1.0f;
-    inline static const float gravityScale = 0.0f;
-    inline static const Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
+    inline static const float k_d = 0.95f;
+    inline static float gravityScale = 1.0f;
+    inline static Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 
-    Eigen::Vector3f p, p_pass, v, f;
+    Eigen::Vector3f p, p_pass, v, v_pass, f;
     float w_i, m, e, u;
-    inline static SolverType solverType = SolverType::Verlet;
+    inline static SolverType solverType = SolverType::SemiEuler;
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
 
-    virtual void forceUpdate() = 0;
     virtual void collisionDetect(const std::list<Object*>& objects) = 0;
     virtual bool possitionCorrect() = 0;
     void solver(const float dt);

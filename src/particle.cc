@@ -8,6 +8,8 @@ Particle::Particle() : Particle(ShaderType::Sphere, Eigen::Vector3f(0.2f, 0.6f, 
 
 Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u) {}
 
+Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const Eigen::Vector3f c) : Particle(ShaderType::Sphere, c, p, v, m, e, u) {}
+
 Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
 {
     this->shaderType = programIndex;
@@ -68,11 +70,13 @@ void Particle::forceUpdate()
             float dis = *itDis;
             Eigen::Vector3f diff = p - l->p;
             Eigen::Vector3f diffV = v - l->v;
-            diffV.x() = abs(diffV.x());
-            diffV.y() = abs(diffV.y());
-            diffV.z() = abs(diffV.z());
+//            diffV.x() = diffV.x() * v.x() < 0? diffV.x() : -diffV.x();
+//            diffV.y() = diffV.y() * v.y() < 0? diffV.y() : -diffV.y();
+//            diffV.z() = diffV.z() * v.z() < 0? diffV.z() : -diffV.z();
             Eigen::Vector3f direction = diff.normalized();
-            f += (k_e * (diff.norm() - dis) + k_d * diffV.dot(direction)) * direction;
+            f -= (k_e * (diff.norm() - dis) + (k_d * diffV.dot(direction))) * direction;
+//            std::cout << "F:" << f << std::endl;
+//            std::cout << std::endl << "NORM:" << diff.norm() << std::endl << "DIS:" << dis << std::endl;
         }
     }
     else {
@@ -80,6 +84,7 @@ void Particle::forceUpdate()
     }
 
 }
+// (yo: b) : a , c
 
 bool Particle::isColliding(Object &) const
 {

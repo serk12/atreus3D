@@ -190,6 +190,7 @@ void Object::solver(const float dtMs)
 {
     float dt = dtMs/1000.0f;
     Eigen::Vector3f aux_p = p;
+    Eigen::Vector3f aux_v = v;
 
     switch(solverType) {
     case SolverType::Euler:
@@ -211,7 +212,7 @@ void Object::solver(const float dtMs)
     default:
         break;
     }
-
+    v_pass = aux_v;
     p_pass = aux_p;
 }
 
@@ -222,19 +223,19 @@ void Object::initSolver()
     w_i = (m < 0)? 0.0f : 1.0f/m;
     f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
     p_pass = p - (v * 0.016f);
+    v_pass = v;
 }
 
 void Object::update(const float deltatime, const std::list<Object*>& meshs)
 {
     solver(deltatime);
     collisionDetect(meshs);
-    forceUpdate();
 }
 
 void Object::correctParticle(const Eigen::Vector3f& n, const float d)
 {
-    Eigen::Vector3f vt = v - ((n.dot(v)) * n);
-    v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
+    Eigen::Vector3f vt = v_pass - ((n.dot(v_pass)) * n);
+    v = (v_pass - (1.0f + e) * (n.dot(v_pass)) * n) - (u * vt);
     p = p - (1.0f + e) * (n.dot(p)+d) * n;
     p_pass = p - (v * 0.016f);
 }
@@ -277,5 +278,11 @@ Eigen::Vector3f Object::getVelocity() const
 void Object::setSolverModel(SolverType solverType)
 {
     Object::solverType = solverType;
+}
+
+void Object::setGravityScale(const float scale)
+{
+    Object::gravityScale = scale;
+    Object::gravity = Object::gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
 }
 

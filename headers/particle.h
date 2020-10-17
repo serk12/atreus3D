@@ -12,6 +12,8 @@ public:
     Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
              const std::list<Particle*> links, const std::list<float> linksDistance);
 
+    Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const Eigen::Vector3f c);
+
     Particle(const ShaderType programIndex,const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u);
     Particle(const ShaderType programIndex, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
              const std::list<Particle*> links, const std::list<float> linksDistance);
@@ -29,7 +31,7 @@ private:
 
     std::list<Particle*> links;
     std::list<float> linksDistance;
-    float k_e = 2.80f, k_d = 1.0f;
+    float k_e = 15.60f, k_d = 2.30f;
     void forceUpdate() final;
     void collisionDetect(const std::list<Object*>& meshs) final;
     bool possitionCorrect() final;

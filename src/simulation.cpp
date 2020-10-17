@@ -1,10 +1,24 @@
 #include "simulation.h"
+#include "ui_mainwindow.h"
 
 #include "particle.h"
 #include "meshTypes.h"
 
 #include <random>
 #include <iostream>
+
+Simulation::Simulation(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::Simulation)
+{
+    ui->setupUi(this);
+}
+
+Simulation::~Simulation()
+{
+    delete ui;
+}
+
 
 bool CubeScene(std::pair<std::list<Object*>, std::list<Object*> >& objects) {
     float rx = 0.75f;
@@ -103,21 +117,34 @@ bool stringScene(std::pair<std::list<Object*>, std::list<Object*> >&objects)
         1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
         1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
        -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
-        };
+    };
 
     boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -2, 0.95f, 0.80f,  GL_LINE_LOOP);
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
-    Particle* aux = new Particle(Eigen::Vector3f(0.0f, 0.5f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, 0.95f, 0.80f);
+    Particle* aux = new Particle(Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, 0.95f, 3.80f);
     objects.second.push_back(aux);
-    for (int i = 1; i < 4; ++i) {
-        Particle* c = new Particle(Eigen::Vector3f(0.0f, 0.5f - 0.1f*i, 0.0f), Eigen::Vector3f(0.1f*i,0.1f*i,0.1f*i), 0.2f, 0.95f, 0.80f);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0, 1);
+    float r = dis(gen)-0.5f;
+    float d = 0.01f;
+    int qttyPar = 10;
+    for (int i = 1; i < qttyPar; ++i) {
+        Particle* c = new Particle(Eigen::Vector3f(0.0f - 0.2f*i, 0.0f, 0.0f),
+                                   Eigen::Vector3f(0.0f*r, 2.0f*r, 0.0f*r),
+                                   0.4f, 0.95f, 0.80f, Eigen::Vector3f(0.1f*i, 0.5f, 0.1f*i));
         objects.second.push_back(c);
-        c->addParticle(aux, 1.5f);
-        aux->addParticle(c, 1.5f);
+        c->addParticle(aux, d);
+        aux->addParticle(c, d);
         aux = c;
     }
+
+    Particle* c = new Particle(Eigen::Vector3f(0.0f - 0.2*qttyPar, 0.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1.0f, 0.95f, 0.80f);
+    c->addParticle(aux, d);
+    aux->addParticle(c, d);
+    objects.second.push_back(c);
     return true;
 }
 
@@ -143,21 +170,48 @@ void Simulation::addParticle(std::list<Object*>& particleList)
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
     float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
-    Particle *b;
+    Particle *b = nullptr;
     switch (Simulation::scenaryType) {
     case ScenaryType::Cascade:
-        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(0.6f*rx, 1.0f, 0.6f*rz), 0.05f, 0.95f, 0.80f);
+        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 0.0f, 2.0f*rz), 0.05f, 0.95f, 0.80f);
         break;
     case ScenaryType::Fountain:
+        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), 0.05f, 0.95f, 0.80f);
+        break;
+    case ScenaryType::Rain:
         b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f, 0.95f, 0.80f);
         break;
     case ScenaryType::Debug:
         b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f, 0.95f, 0.80f);
         break;
     default:
-        b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 0.05f, 0.95f, 0.80f);
         break;
     }
-    b->load();
-    particleList.push_back(b);
+    if (b != nullptr) {
+        b->load();
+        particleList.push_back(b);
+    }
+}
+
+
+void Simulation::on_GravityScale_valueChanged(int value)
+{
+    Object::setGravityScale(value/100.0f);
+}
+
+
+void Simulation::on_TopParticles_valueChanged(int value)
+{
+    Simulation::maxParticles = value;
+}
+
+void Simulation::on_BirdTime_valueChanged(int value)
+{
+    Simulation::birdTime = value;
+}
+
+
+void Simulation::on_LiveTime_valueChanged(int value)
+{
+    Simulation::liveTime = value;
 }

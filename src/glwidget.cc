@@ -63,15 +63,7 @@ void GLWidget::initializeGL()
 
     bool no_problems = Object::vanillaProgramsLoad();
     if (! no_problems) exit(0);
-    Simulation::loadSim(objects, Simulation::scenaryType);
-    Object::setSolverModel(Simulation::solverType);
-    for (Object* &o : objects.first) {
-        o->load();
-    }
-    for (Object* &o : objects.second) {
-        o->load();
-    }
-
+    loadScenary();
     initialized = true;
 }
 
@@ -110,7 +102,7 @@ void GLWidget::paintGL()
         Object::cameraMatrixCalc(camera_);
         float currentTime = frameTime.elapsed();
         float dt = currentTime - previousTime;
-        dt = 1;
+//        dt = 5;
         previousTime = currentTime;
 
         //mesh
@@ -119,6 +111,7 @@ void GLWidget::paintGL()
         }
         //particles
         for (Object* &o : objects.second) {
+            o->forceUpdate();
             o->update(dt, objects.first);
             o->render();
         }
@@ -196,3 +189,35 @@ void GLWidget::createParticle()
     }
 }
 
+void GLWidget::cleanScenary()
+{
+    toCreate = 0;
+    for (QTimer* &t : lifeTimer) {
+        delete t;
+    }
+    lifeTimer.clear();
+
+    for (Object* &o : objects.first) {
+        delete o;
+    }
+    objects.first.clear();
+
+    for (Object* &o : objects.second) {
+        delete o;
+    }
+    objects.second.clear();
+    initialized = false;
+}
+
+
+void GLWidget::loadScenary() {
+    Simulation::loadSim(objects, Simulation::scenaryType);
+    Object::setSolverModel(Simulation::solverType);
+    for (Object* &o : objects.first) {
+        o->load();
+    }
+    for (Object* &o : objects.second) {
+        o->load();
+    }
+    initialized = true;
+}

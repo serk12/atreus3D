@@ -23,6 +23,9 @@ public:
     GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
+    void cleanScenary();
+    void loadScenary();
+
 public slots:
     void cleanup();
 
@@ -41,7 +44,6 @@ private:
     void updateFPS();
     QElapsedTimer frameTime;
     QTimer *fpsTimer, *birdTimer;
-    std::list<QTimer*> lifeTimer;
     float previousTime = 0.0f;
     int frameCounter = 0;
 
@@ -52,6 +54,7 @@ private:
 
     //objects = meshes, particles
     std::pair<std::list<Object*>, std::list<Object*> > objects;
+    std::list<QTimer*> lifeTimer;
 
 
     int toCreate = 0;
