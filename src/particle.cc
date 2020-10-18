@@ -71,7 +71,7 @@ void Particle::forceUpdate()
             Eigen::Vector3f diff = p - l->p;
             Eigen::Vector3f diffV = v - l->v;
             Eigen::Vector3f direction = diff.normalized();
-            f -= (k_e * (diff.norm() - dis) + (k_d * diffV.dot(direction))) * direction;
+            f -= (k_elas * (diff.norm() - dis) + (k_damp * diffV.dot(direction))) * direction;
         }
     }
     else {
@@ -79,7 +79,6 @@ void Particle::forceUpdate()
     }
 
 }
-// (yo: b) : a , c
 
 bool Particle::isColliding(Object &) const
 {
@@ -94,3 +93,24 @@ void Particle::collisionDetect(const std::list<Object*>& meshs)
 }
 
 bool Particle::possitionCorrect() {return false;}
+
+
+void Particle::setElasticityTerms(const float k_elas, const float k_damp)
+{
+    this->k_elas = k_elas;
+    this->k_damp = k_damp;
+}
+
+void Particle::setDistancyTerm(const float d)
+{
+    std::list<float>::iterator it = linksDistance.begin();
+    float ref = *it;
+    for (; it != linksDistance.end(); ++it) {
+        if (*it != ref) return;
+    }
+
+    for (std::list<float>::iterator it = linksDistance.begin(); it != linksDistance.end(); ++it) {
+        *it = d;
+    }
+}
+

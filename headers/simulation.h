@@ -27,13 +27,21 @@ public:
     inline static Object::SolverType solverType = Object::SolverType::Verlet;
 
     inline static unsigned int liveTime = 100000;
-    inline static unsigned int birdTime = 101;
-    inline static unsigned int maxParticles = 501;
+    inline static unsigned int birdTime = 100;
+    inline static unsigned int maxParticles = 500;
 
-    inline static float gravityScale = .990f;
+    inline static float gravityScale = 1.0f;
     inline static float k_d = 0.95f;
 
-    inline static int initiated = 0;
+    inline static float e = 0.95f;
+    inline static float u = 0.85f;
+    inline static float m = 0.05f;
+
+    inline static float k_elas = 10.5f;
+    inline static float k_dump =  2.5f;
+
+    inline static int initiatedScen = 0;
+    inline static int initiatedSolv = 0;
 
 private:
     Ui::Simulation *ui;

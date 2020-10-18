@@ -25,13 +25,16 @@ public:
 
     void addParticle(Particle* &p, const float distance);
 
+    void setElasticityTerms(const float k_elas, const float k_damp);
+    void setDistancyTerm(const float d);
+
 private:
     inline static const GLenum TYPE = GL_POINTS;
     inline static const float r = 0.0175f;
 
     std::list<Particle*> links;
     std::list<float> linksDistance;
-    float k_e = 17.60f, k_d = 2.30f;
+    float k_elas = 23.60f, k_damp = 2.30f;
     void forceUpdate() final;
     void collisionDetect(const std::list<Object*>& meshs) final;
     bool possitionCorrect() final;
