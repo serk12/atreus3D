@@ -2,6 +2,7 @@
 #define MESHTYPES_H
 
 #include "mesh.h"
+#include "utils.h"
 
 class Sphere : public Mesh {
 public:
@@ -13,7 +14,7 @@ public:
     bool isColliding(Object& object) const final;
 
 private:
-    float r = 0.25f;
+    float r = GENERAL_RM;
     float r2 = r*r;
 };
 

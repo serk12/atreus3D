@@ -12,24 +12,33 @@ Simulation::Simulation(QWidget *parent)
     , ui(new Ui::Simulation)
 {
     ui->setupUi(this);
-    ui->SolverMethod->insertItem(ui->SolverMethod->count(), "Euler", Object::SolverType::Euler);
-    ui->SolverMethod->insertItem(ui->SolverMethod->count(), "SemiEuler", Object::SolverType::SemiEuler);
-    ui->SolverMethod->insertItem(ui->SolverMethod->count(), "Verlet", Object::SolverType::Verlet);
+    ui->SolverMethod->insertItem(int(Object::SolverType::Euler), "Euler", Object::SolverType::Euler);
+    ui->SolverMethod->insertItem(int(Object::SolverType::SemiEuler), "SemiEuler", Object::SolverType::SemiEuler);
+    ui->SolverMethod->insertItem(int(Object::SolverType::Verlet), "Verlet", Object::SolverType::Verlet);
 
-    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Cascade", ScenaryType::Cascade);
-    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Rain", ScenaryType::Rain);
-    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Fountain", ScenaryType::Fountain);
-    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "String", ScenaryType::String);
-    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Debug", ScenaryType::Debug);
-    ui->ScenaryType->insertItem(ui->ScenaryType->count(), "Debug String", ScenaryType::DebugS);
+    ui->ScenaryType->insertItem(int(ScenaryType::Cascade), "Cascade", ScenaryType::Cascade);
+    ui->ScenaryType->insertItem(int(ScenaryType::Rain), "Rain", ScenaryType::Rain);
+    ui->ScenaryType->insertItem(int(ScenaryType::Fountain), "Fountain", ScenaryType::Fountain);
+    ui->ScenaryType->insertItem(int(ScenaryType::String), "String", ScenaryType::String);
+    ui->ScenaryType->insertItem(int(ScenaryType::Debug), "Debug", ScenaryType::Debug);
+    ui->ScenaryType->insertItem(int(ScenaryType::DebugS), "Debug String", ScenaryType::DebugS);
 
     ui->BirdTime->setValue(Simulation::birdTime);
     ui->Kd->setValue(Simulation::k_d*100);
     ui->LiveTime->setValue(Simulation::liveTime);
     ui->TopParticles->setValue(Simulation::maxParticles);
     ui->GravityScale->setValue(Simulation::gravityScale*100);
+
     ui->SolverMethod->setCurrentIndex(int(Simulation::solverType));
     ui->ScenaryType->setCurrentIndex(int(Simulation::scenaryType));
+
+    ui->Distance->setValue(Simulation::d);
+    ui->Elasticity->setValue(Simulation::k_elas);
+    ui->Damping->setValue(Simulation::k_dump);
+
+    ui->Mass->setValue(Simulation::m);
+    ui->Plastic->setValue(Simulation::e);
+    ui->Friction->setValue(Simulation::u);
 }
 
 Simulation::~Simulation()
@@ -38,7 +47,7 @@ Simulation::~Simulation()
 }
 
 
-bool CubeScene(std::pair<std::list<Object*>, std::list<Object*> >& objects) {
+bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects) {
     float rx = 0.75f;
     float ry = 0.3f;
     float rz = 0.75f;
@@ -123,7 +132,7 @@ bool CubeScene(std::pair<std::list<Object*>, std::list<Object*> >& objects) {
     return true;
 }
 
-bool stringScene(std::pair<std::list<Object*>, std::list<Object*> >&objects)
+bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
     float rx = 0.75f;
     float ry = 0.3f;
@@ -150,27 +159,26 @@ bool stringScene(std::pair<std::list<Object*>, std::list<Object*> >&objects)
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
     float r = dis(gen)-0.5f;
-    float d = 0.01f;
     int qttyPar = 10;
     for (int i = 1; i < qttyPar; ++i) {
-        Particle* c = new Particle(Eigen::Vector3f(1.0f - 0.2f*i, 1.0f, 0.0f),
+        Particle* c = new Particle(Eigen::Vector3f(1.0f + 0.2f*i, 1.0f, 0.0f),
                                    Eigen::Vector3f(0.0f*r, 2.0f*r, 0.0f*r),
                                    0.4f, 0.95f, 0.80f, Eigen::Vector3f(0.1f*i, 0.5f, 0.1f*i));
         objects.second.push_back(c);
-        c->addParticle(aux, d);
-        aux->addParticle(c, d);
+        c->addParticle(aux, Simulation::d);
+        aux->addParticle(c, Simulation::d);
         aux = c;
     }
 
-    Particle* c = new Particle(Eigen::Vector3f(1.0f - 0.2*qttyPar, 1.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1.0f, 0.95f, 0.80f);
-    c->addParticle(aux, d);
-    aux->addParticle(c, d);
+    Particle* c = new Particle(Eigen::Vector3f(1.0f + 0.2*qttyPar, 1.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1.0f, 0.95f, 0.80f);
+    c->addParticle(aux, Simulation::d);
+    aux->addParticle(c, Simulation::d);
     objects.second.push_back(c);
     return true;
 }
 
 
-bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& objects)
+bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
 {
     Object::setSolverModel(Simulation::solverType);
     Object::setKd(Simulation::k_d);
@@ -193,7 +201,7 @@ bool Simulation::loadSim(std::pair<std::list<Object*>, std::list<Object*> >& obj
     return result;
 }
 
-void Simulation::addParticle(std::list<Object*>& particleList)
+void Simulation::addParticle(std::list<Particle*>& particleList)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -300,3 +308,33 @@ void Simulation::on_SolverMethod_currentIndexChanged(int index)
     }
 }
 
+
+void Simulation::on_Plastic_valueChanged(double e)
+{
+    Simulation::e = e;
+}
+
+void Simulation::on_Friction_valueChanged(double u)
+{
+    Simulation::u = u;
+}
+
+void Simulation::on_Mass_valueChanged(double m)
+{
+    Simulation::m = m;
+}
+
+void Simulation::on_Elasticity_valueChanged(double k_elas)
+{
+    ui->openGLWidget->updeteElasticityTerms(k_elas);
+}
+
+void Simulation::on_Damping_valueChanged(double k_damp)
+{
+    ui->openGLWidget->updeteDumpingTerms(k_damp);
+}
+
+void Simulation::on_Distance_valueChanged(double d)
+{
+    ui->openGLWidget->updeteDistanceTerms(d);
+}

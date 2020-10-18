@@ -31,7 +31,8 @@ HEADERS += \
     headers/meshTypes.h \
     headers/object.h \
     headers/particle.h \
-    headers/simulation.h
+    headers/simulation.h \
+    headers/utils.h
 
 FORMS += \
     forms/mainwindow.ui

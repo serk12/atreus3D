@@ -32,11 +32,11 @@ GLWidget::~GLWidget()
     cleanup();
     Object::deleteVanillas();
     delete fpsTimer;
-    for (Object* &o : objects.first) {
-        delete o;
+    for (Mesh* &m : objects.first) {
+        delete m;
     }
-    for (Object* &o : objects.second) {
-        delete o;
+    for (Particle* &p : objects.second) {
+        delete p;
     }
 }
 
@@ -106,13 +106,14 @@ void GLWidget::paintGL()
         previousTime = currentTime;
 
         //mesh
-        for (Object* &o : objects.first) {
+        for (Mesh* &o : objects.first) {
             o->render();
         }
         //particles
-        for (Object* &o : objects.second) {
+        for (Particle* &o : objects.second) {
             o->forceUpdate();
-            o->update(dt, objects.first);
+            std::list<Object*> aux(objects.first.begin(), objects.first.end());
+            o->update(dt, aux);
             o->render();
         }
     }
@@ -197,13 +198,13 @@ void GLWidget::cleanScenary()
     }
     lifeTimer.clear();
 
-    for (Object* &o : objects.first) {
-        delete o;
+    for (Mesh* &m : objects.first) {
+        delete m;
     }
     objects.first.clear();
 
-    for (Object* &o : objects.second) {
-        delete o;
+    for (Particle* &p : objects.second) {
+        delete p;
     }
     objects.second.clear();
     initialized = false;
@@ -212,15 +213,35 @@ void GLWidget::cleanScenary()
 
 void GLWidget::loadScenary() {
     Simulation::loadSim(objects);
-    for (Object* &o : objects.first) {
-        o->load();
+    for (Mesh* &m : objects.first) {
+        m->load();
     }
-    for (Object* &o : objects.second) {
-        o->load();
+    for (Particle* &p : objects.second) {
+        p->load();
     }
     initialized = true;
 }
 
 void GLWidget::setBirthTime(int value) {
     birdTimer->start(value);
+}
+
+
+void GLWidget::updeteElasticityTerms(float k_elas) {
+    for (Particle* &p : objects.second) {
+        p->setElasticityTerm(k_elas);
+    }
+}
+
+
+void GLWidget::updeteDumpingTerms(float k_dump) {
+    for (Particle* &p : objects.second) {
+        p->setDampingTerm(k_dump);
+    }
+}
+
+void GLWidget::updeteDistanceTerms(float d) {
+    for (Particle* &p : objects.second) {
+        p->setDistancyTerm(d);
+    }
 }

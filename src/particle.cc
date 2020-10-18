@@ -94,11 +94,14 @@ void Particle::collisionDetect(const std::list<Object*>& meshs)
 
 bool Particle::possitionCorrect() {return false;}
 
+void Particle::setDampingTerm(const float k_damp)
+{
+    this->k_damp = k_damp;
+}
 
-void Particle::setElasticityTerms(const float k_elas, const float k_damp)
+void Particle::setElasticityTerm(const float k_elas)
 {
     this->k_elas = k_elas;
-    this->k_damp = k_damp;
 }
 
 void Particle::setDistancyTerm(const float d)

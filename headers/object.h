@@ -5,6 +5,7 @@
 #include <QEvent>
 #include <list>
 #include "camera.h"
+#include "utils.h"
 
 #define QTTYSHADERS 2
 
@@ -59,8 +60,8 @@ protected:
 
     // phisics variables
     inline static float k_d;
-    inline static float gravityScale = 1.0f;
-    inline static Eigen::Vector3f gravity = gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
+    inline static float gravityScale = GENERAL_GRAVITY_SCALE;
+    inline static Eigen::Vector3f gravity = gravityScale * GENERAL_GRAVITY;
 
     Eigen::Vector3f p, p_pass, v, v_pass, f;
     float w_i, m, e, u;
@@ -74,7 +75,7 @@ protected:
     void initSolver();
 
 private:
-    inline static Eigen::Vector3f lightColor = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
+    inline static Eigen::Vector3f lightColor = GENERAL_LIGHT;
 
 };
 

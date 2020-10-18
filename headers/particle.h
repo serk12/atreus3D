@@ -4,6 +4,7 @@
 #include <list>
 
 #include "object.h"
+#include "utils.h"
 
 class Particle : public Object {
 public:
@@ -20,22 +21,23 @@ public:
 
     void render() const final;
     void event(QEvent *event) final;
+    void forceUpdate() final;
     bool isColliding(Object& object) const final;
     float getRadius() const final;
 
     void addParticle(Particle* &p, const float distance);
 
-    void setElasticityTerms(const float k_elas, const float k_damp);
+    void setElasticityTerm(const float k_elas);
+    void setDampingTerm(const float k_damp);
     void setDistancyTerm(const float d);
 
 private:
     inline static const GLenum TYPE = GL_POINTS;
-    inline static const float r = 0.0175f;
+    inline static const float r = GENERAL_R;
 
     std::list<Particle*> links;
     std::list<float> linksDistance;
-    float k_elas = 23.60f, k_damp = 2.30f;
-    void forceUpdate() final;
+    float k_elas = GENERAL_K_ELAS, k_damp = GENERAL_K_DUMP;
     void collisionDetect(const std::list<Object*>& meshs) final;
     bool possitionCorrect() final;
 

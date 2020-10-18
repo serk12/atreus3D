@@ -26,6 +26,9 @@ public:
     void cleanScenary();
     void loadScenary();
     void setBirthTime(int value);
+    void updeteElasticityTerms(float k_elas);
+    void updeteDumpingTerms(float k_dump);
+    void updeteDistanceTerms(float d);
 
 public slots:
     void cleanup();
@@ -54,7 +57,7 @@ private:
     bool initialized = false;
 
     //objects = meshes, particles
-    std::pair<std::list<Object*>, std::list<Object*> > objects;
+    std::pair<std::list<Mesh*>, std::list<Particle*> > objects;
     std::list<QTimer*> lifeTimer;
 
 

@@ -283,7 +283,7 @@ void Object::setSolverModel(SolverType solverType)
 void Object::setGravityScale(const float scale)
 {
     Object::gravityScale = scale;
-    Object::gravity = Object::gravityScale * Eigen::Vector3f(0.0f, -9.81f, 0.0f);
+    Object::gravity = Object::gravityScale * GENERAL_GRAVITY;
 }
 
 void Object::setKd(float kd)
