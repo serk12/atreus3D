@@ -150,30 +150,36 @@ bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
     Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),
+                           Eigen::Vector3f(0.0f,0.2f,0.3f),
+                           Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.5f);
     objects.first.push_back(s);
+    int qttyStrings = 10;
+    for (int j = 0; j < qttyStrings; ++j) {
+        Particle* aux = new Particle(Eigen::Vector3f(-0.5f + 0.1f*j, 1.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, Simulation::e, Simulation::u);
+        objects.second.push_back(aux);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(0, 1);
+        float r = dis(gen)-0.5f;
+        int qttyPar = 10;
+        for (int i = 1; i < qttyPar; ++i) {
+            Particle* c = new Particle(Eigen::Vector3f(-0.5f + 0.1f*j, 1.0f + Simulation::d*i, 0.5f),
+                                       Eigen::Vector3f(0.01f*r, 0.0f*r, 0.01f*r),
+                                       Simulation::m, Simulation::e, Simulation::u, Eigen::Vector3f(0.1f*i, 0.5f, 0.1f*i));
+            objects.second.push_back(c);
+            c->addParticle(aux, Simulation::d);
+            aux->addParticle(c, Simulation::d);
+            aux = c;
+        }
 
-    Particle* aux = new Particle(Eigen::Vector3f(1.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, 0.95f, 0.80f);
-    objects.second.push_back(aux);
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0, 1);
-    float r = dis(gen)-0.5f;
-    int qttyPar = 10;
-    for (int i = 1; i < qttyPar; ++i) {
-        Particle* c = new Particle(Eigen::Vector3f(1.0f + 0.2f*i, 1.0f, 0.0f),
-                                   Eigen::Vector3f(0.0f*r, 2.0f*r, 0.0f*r),
-                                   0.4f, 0.95f, 0.80f, Eigen::Vector3f(0.1f*i, 0.5f, 0.1f*i));
-        objects.second.push_back(c);
+        Particle* c = new Particle(Eigen::Vector3f(-0.5f + 0.1f*j, 1.0f + Simulation::d*qttyPar, 0.5f),
+                                   Eigen::Vector3f(0.0f,0.0f,0.0f),
+                                   Simulation::m, Simulation::e, Simulation::u);
         c->addParticle(aux, Simulation::d);
         aux->addParticle(c, Simulation::d);
-        aux = c;
+        objects.second.push_back(c);
     }
-
-    Particle* c = new Particle(Eigen::Vector3f(1.0f + 0.2*qttyPar, 1.0f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1.0f, 0.95f, 0.80f);
-    c->addParticle(aux, Simulation::d);
-    aux->addParticle(c, Simulation::d);
-    objects.second.push_back(c);
     return true;
 }
 

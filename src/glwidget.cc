@@ -106,13 +106,16 @@ void GLWidget::paintGL()
         previousTime = currentTime;
 
         //mesh
+        std::list<Object*> aux(objects.first.begin(), objects.first.end());
         for (Mesh* &o : objects.first) {
+            o->update(dt, aux);
             o->render();
         }
         //particles
         for (Particle* &o : objects.second) {
             o->forceUpdate();
-            std::list<Object*> aux(objects.first.begin(), objects.first.end());
+        }
+        for (Particle* &o : objects.second) {
             o->update(dt, aux);
             o->render();
         }

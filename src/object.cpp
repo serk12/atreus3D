@@ -189,9 +189,9 @@ void Object::load()
 void Object::solver(const float dtMs)
 {
     float dt = dtMs/1000.0f;
+
     Eigen::Vector3f aux_p = p;
     Eigen::Vector3f aux_v = v;
-
     switch(solverType) {
     case SolverType::Euler:
         p = p + dt*v;
@@ -234,8 +234,8 @@ void Object::update(const float deltatime, const std::list<Object*>& meshs)
 
 void Object::correctParticle(const Eigen::Vector3f& n, const float d)
 {
-    Eigen::Vector3f vt = v_pass - ((n.dot(v_pass)) * n);
-    v = (v_pass - (1.0f + e) * (n.dot(v_pass)) * n) - (u * vt);
+    Eigen::Vector3f vt = v - ((n.dot(v)) * n);
+    v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
     p = p - (1.0f + e) * (n.dot(p)+d) * n;
     p_pass = p - (v * 0.016f);
 }
@@ -273,6 +273,11 @@ Eigen::Vector3f Object::getPassPosition() const
 Eigen::Vector3f Object::getVelocity() const
 {
     return v;
+}
+
+Eigen::Vector3f Object::getPassVelocity() const
+{
+    return v_pass;
 }
 
 void Object::setSolverModel(SolverType solverType)

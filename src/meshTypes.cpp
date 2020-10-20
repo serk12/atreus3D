@@ -20,17 +20,10 @@ void calculateNormal(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const E
     }
 }
 
-inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const float = 0.0f)
+inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const float r = 0.0f)
 {
-    return (n.dot(p) + d) * (n.dot(p_pass) + d) <= 0.0f;
-}
-
-void correctParticle(Eigen::Vector3f& p, Eigen::Vector3f& v, Eigen::Vector3f& p_pass, const float e, const float u, const Eigen::Vector3f& n, const float d)
-{
-    Eigen::Vector3f vt = v - ((n.dot(v)) * n);
-    v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
-    p = p - (1.0f + e) * (n.dot(p)+d) * n;
-    p_pass = p - (v * 0.016f);
+    float d_aux = d + (r*n).norm();
+    return (n.dot(p) + d_aux) * (n.dot(p_pass) + d_aux) <= 0.0f;
 }
 
 // ****** //
@@ -61,11 +54,12 @@ bool Sphere::isColliding(Object &object) const
     float r2o = object.getRadius() * object.getRadius();
     Eigen::Vector3f c = this->p;
     Eigen::Vector3f diff_p = p - c;
-    if ((diff_p.transpose() * diff_p) - (this->r2 - r2o) <= 0.0f) {
+    if ((diff_p.transpose() * diff_p) - (this->r2 + r2o) <= 0) {
         float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
         float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
         float dir1 = (-beta+aux_1)/(aux_2);
         float dir2 = (-beta-aux_1)/(aux_2);
+        if (std::isnan(dir1) && std::isnan(dir2)) return false;
         Eigen::Vector3f P = object.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
         Eigen::Vector3f n = (P - c).normalized();
         float d = -(n.x()*p.x() + n.y()*p.y() + n.z()*p.z());

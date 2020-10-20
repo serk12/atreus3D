@@ -40,6 +40,7 @@ public:
     Eigen::Vector3f getPosition() const;
     Eigen::Vector3f getPassPosition() const;
     Eigen::Vector3f getVelocity() const;
+    Eigen::Vector3f getPassVelocity() const;
 
     static void setSolverModel(const SolverType solverType);
     static void setGravityScale(const float scale);

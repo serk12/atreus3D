@@ -68,7 +68,7 @@ void Particle::forceUpdate()
         for (std::list<Particle*>::iterator it = links.begin(); it != links.end(); ++it, ++itDis) {
             Particle* l = *it;
             float dis = *itDis;
-            Eigen::Vector3f diff = p - l->p;
+            Eigen::Vector3f diff  = p - l->p;
             Eigen::Vector3f diffV = v - l->v;
             Eigen::Vector3f direction = diff.normalized();
             f -= (k_elas * (diff.norm() - dis) + (k_damp * diffV.dot(direction))) * direction;

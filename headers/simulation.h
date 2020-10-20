@@ -26,8 +26,8 @@ public:
     static bool loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects);
     static void addParticle(std::list<Particle*>& particleList);
 
-    inline static ScenaryType scenaryType = Simulation::ScenaryType::String;
-    inline static Object::SolverType solverType = Object::SolverType::Verlet;
+    inline static ScenaryType scenaryType = GENERAL_SCENARY_TYPE;
+    inline static Object::SolverType solverType = GENERAL_SOLVER_TYPE;
 
     inline static unsigned int liveTime = GENERAL_LIVE_TIME;
     inline static unsigned int birdTime = GENERAL_BIRTH_TIME;
