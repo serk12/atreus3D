@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define GENERAL_E 0.95f
+#define GENERAL_E 1.0f
 #define GENERAL_U 0.0f
 #define GENERAL_M 0.405f
 #define GENERAL_R 0.0175f

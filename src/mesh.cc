@@ -37,6 +37,6 @@ void Mesh::event(QEvent *) {}
 
 void Mesh::forceUpdate() {}
 
-void Mesh::collisionDetect(const std::list<Object*>&) {}
+bool Mesh::collisionDetect(const std::list<Object*>&) {return false;}
 
-bool Mesh::possitionCorrect() {return false;}
+void Mesh::propagateCollision(const std::list<Object*>& ) {}

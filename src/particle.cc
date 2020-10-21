@@ -85,14 +85,14 @@ bool Particle::isColliding(Object &) const
     return false;
 }
 
-void Particle::collisionDetect(const std::list<Object*>& meshs)
+bool Particle::collisionDetect(const std::list<Object*>& meshs)
 {
+    bool result = false;
     for (Object* m : meshs) {
-        m->isColliding(*this);
+        if(m->isColliding(*this)) result = true;
     }
+    return result;
 }
-
-bool Particle::possitionCorrect() {return false;}
 
 void Particle::setDampingTerm(const float k_damp)
 {
@@ -117,3 +117,11 @@ void Particle::setDistancyTerm(const float d)
     }
 }
 
+void Particle::propagateCollision(const std::list<Object*>& meshs)
+{
+    for (std::list<Particle*>::iterator it = links.begin(); it != links.end(); ++it) {
+        // first do the correction then check if errors
+        bool result = (*it)->collisionDetect(meshs);
+        if (result) (*it)->propagateCollision(meshs);
+    }
+}

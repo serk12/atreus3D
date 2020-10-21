@@ -7,8 +7,8 @@
 
 namespace data_visualization {
 
-const double kMaxCameraDistance = 3.0;
-const double kMinCameraDistance = -kMaxCameraDistance;
+const double kMaxCameraDistance = 6.0;
+const double kMinCameraDistance = -3;
 
 const double kMinRotationX = -M_PI / 2;
 const double MaxRotationX = M_PI / 2;

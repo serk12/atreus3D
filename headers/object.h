@@ -70,8 +70,8 @@ protected:
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
 
-    virtual void collisionDetect(const std::list<Object*>& objects) = 0;
-    virtual bool possitionCorrect() = 0;
+    virtual bool collisionDetect(const std::list<Object*>& objects) = 0;
+    virtual void propagateCollision(const std::list<Object*>& meshs) = 0;
     void solver(const float dt);
     void initSolver();
 

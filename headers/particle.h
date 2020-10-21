@@ -21,12 +21,11 @@ public:
 
     void render() const final;
     void event(QEvent *event) final;
-    void forceUpdate() final;
     bool isColliding(Object& object) const final;
     float getRadius() const final;
+    void forceUpdate() final;
 
     void addParticle(Particle* &p, const float distance);
-
     void setElasticityTerm(const float k_elas);
     void setDampingTerm(const float k_damp);
     void setDistancyTerm(const float d);
@@ -38,8 +37,8 @@ private:
     std::list<Particle*> links;
     std::list<float> linksDistance;
     float k_elas = GENERAL_K_ELAS, k_damp = GENERAL_K_DUMP;
-    void collisionDetect(const std::list<Object*>& meshs) final;
-    bool possitionCorrect() final;
+    bool collisionDetect(const std::list<Object*>& meshs) final;
+    void propagateCollision(const std::list<Object*>& meshs) final;
 
 };
 

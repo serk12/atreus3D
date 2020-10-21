@@ -229,7 +229,10 @@ void Object::initSolver()
 void Object::update(const float deltatime, const std::list<Object*>& meshs)
 {
     solver(deltatime);
-    collisionDetect(meshs);
+    bool result = collisionDetect(meshs);
+    if (result) {
+        propagateCollision(meshs);
+    }
 }
 
 void Object::correctParticle(const Eigen::Vector3f& n, const float d)

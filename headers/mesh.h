@@ -12,14 +12,13 @@ public:
 
     void render() const final;
     void event(QEvent *event) final;
+    void forceUpdate() final;
 
 private:
     GLenum type;
 
-    void forceUpdate() final;
-    void collisionDetect(const std::list<Object*>& meshs) final;
-
-    bool possitionCorrect() final;
+    bool collisionDetect(const std::list<Object*>& meshs) final;
+    void propagateCollision(const std::list<Object*>& meshs) final;
 };
 
 #endif // MESH_H
