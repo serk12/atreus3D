@@ -30,7 +30,7 @@ public:
     void load();
     virtual bool isColliding(Object& object) const = 0;
 
-    void correctParticle(const Eigen::Vector3f& n, const float d);
+    void correctObject(const Eigen::Vector3f& n, const float d);
 
     virtual float getRadius() const = 0;
     float getWeight() const;

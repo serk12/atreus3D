@@ -220,7 +220,7 @@ void Object::initSolver()
 {
     if (m == -1) physicsType = PhysicsType::Immovable;
     else if (m == -2) physicsType = PhysicsType::Transparent;
-    w_i = (m < 0)? 0.0f : 1.0f/m;
+    w_i = (m < 0.0f)? 0.0f : 1.0f/m;
     f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
     p_pass = p - (v * 0.016f);
     v_pass = v;
@@ -235,11 +235,12 @@ void Object::update(const float deltatime, const std::list<Object*>& meshs)
     }
 }
 
-void Object::correctParticle(const Eigen::Vector3f& n, const float d)
+void Object::correctObject(const Eigen::Vector3f& n, const float d)
 {
+    float d_aux = d + (this->getRadius()*n).norm();
     Eigen::Vector3f vt = v - ((n.dot(v)) * n);
     v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
-    p = p - (1.0f + e) * (n.dot(p)+d) * n;
+    p = p - (1.0f + e) * (n.dot(p)+d_aux) * n;
     p_pass = p - (v * 0.016f);
 }
 

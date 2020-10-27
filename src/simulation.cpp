@@ -22,6 +22,7 @@ Simulation::Simulation(QWidget *parent)
     ui->ScenaryType->insertItem(int(ScenaryType::String), "String", ScenaryType::String);
     ui->ScenaryType->insertItem(int(ScenaryType::Debug), "Debug", ScenaryType::Debug);
     ui->ScenaryType->insertItem(int(ScenaryType::DebugS), "Debug String", ScenaryType::DebugS);
+    ui->ScenaryType->insertItem(int(ScenaryType::CurlyString), "Curly String", ScenaryType::CurlyString);
 
     ui->BirdTime->setValue(Simulation::birdTime);
     ui->Kd->setValue(Simulation::k_d*100);
@@ -161,6 +162,48 @@ void createString(std::list<Particle*>& particles, Eigen::Vector3f pos, int qtty
     particles.push_back(c);
 }
 
+void creatCurlyHair(std::list<Particle*>& particles, Eigen::Vector3f pos, int qttyPar, int id)
+{
+    Particle* aux = new Particle(pos, Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, Simulation::e, Simulation::u);
+    particles.push_back(aux);
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0, 1);
+
+    float r = dis(gen)-0.5f;
+    Particle *aux2 = nullptr;
+    Particle *aux3 = nullptr;
+
+    for (int i = 1; i < qttyPar; ++i) {
+        Particle* c = new Particle(pos + Eigen::Vector3f(0.0f, Simulation::d*i, 0.0f),
+                                   Eigen::Vector3f(0.001f*r, 0.0f*r, 0.001f*r),
+                                   Simulation::m, Simulation::e, Simulation::u, Eigen::Vector3f(0.1f*i, id/10.0f, 0.1f*i));
+        particles.push_back(c);
+        if(aux3 != nullptr) {
+            c->addParticle(aux3, Simulation::d*1.5f);
+            aux3->addParticle(c, Simulation::d*1.5f);
+        }
+        aux3 = aux2;
+        if(aux2 != nullptr) {
+            c->addParticle(aux2, Simulation::d*1.25f);
+            aux2->addParticle(c, Simulation::d*1.25f);
+
+        }
+        aux2 = aux;
+        c->addParticle(aux, Simulation::d);
+        aux->addParticle(c, Simulation::d);
+        aux = c;
+    }
+
+    Particle* c = new Particle(pos + Eigen::Vector3f(0.0f, Simulation::d*qttyPar, 0.0f),
+                               Eigen::Vector3f(0.0f,0.0f,0.0f),
+                               Simulation::m, Simulation::e, Simulation::u);
+    c->addParticle(aux, Simulation::d);
+    aux->addParticle(c, Simulation::d);
+    particles.push_back(c);
+}
+
 bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
     float rx = 0.75f;
@@ -183,10 +226,37 @@ bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
                            Eigen::Vector3f(0.0f,0.2f,0.1f),
                            Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.5f);
     objects.first.push_back(s);
-    int qttyStrings = 20, qttyPar = 20;
-    float gap = 0.01f;
+
+    int qttyStrings = 3, qttyPar = 10;
+    float gap = 0.15f;
     for (int j = 0; j < qttyStrings; ++j) {
         createString(objects.second, Eigen::Vector3f((-qttyStrings*gap*0.5f) + gap*j,1.0f, 0.0f), qttyPar, j);
+    }
+    return true;
+}
+
+bool stringCurly(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
+{
+    float rx = 0.75f;
+    float ry = 0.3f;
+    float rz = 0.75f;
+    std::vector<float> box;
+    std::vector<unsigned int> boxi;
+    box = {
+        -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
+        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+    };
+
+    boxi = {0,1,2,3};
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, -1.00f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
+    objects.first.push_back(a);
+
+    int qttyStrings = 3, qttyPar = 10;
+    float gap = 0.15f;
+    for (int j = 0; j < qttyStrings; ++j) {
+        creatCurlyHair(objects.second, Eigen::Vector3f((-qttyStrings*gap*0.5f) + gap*j,1.0f, 0.0f), qttyPar, j);
     }
     return true;
 }
@@ -203,6 +273,10 @@ bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& obj
     case ScenaryType::String:
         Simulation::liveTime = 1000000000;
         result = stringScene(objects);
+        break;
+    case ScenaryType::CurlyString:
+        Simulation::liveTime = 1000000000;
+        result = stringCurly(objects);
         break;
     case ScenaryType::Cascade:
     case ScenaryType::Fountain:
