@@ -23,6 +23,7 @@ Simulation::Simulation(QWidget *parent)
     ui->ScenaryType->insertItem(int(ScenaryType::Debug), "Debug", ScenaryType::Debug);
     ui->ScenaryType->insertItem(int(ScenaryType::DebugS), "Debug String", ScenaryType::DebugS);
     ui->ScenaryType->insertItem(int(ScenaryType::CurlyString), "Curly String", ScenaryType::CurlyString);
+    ui->ScenaryType->insertItem(int(ScenaryType::Cloth), "Cloth", ScenaryType::Cloth);
 
     ui->BirdTime->setValue(Simulation::birdTime);
     ui->Kd->setValue(Simulation::k_d*100);
@@ -261,6 +262,98 @@ bool stringCurly(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
     return true;
 }
 
+void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
+    std::vector< std::vector<Particle* > > particlesMesh(maxI, std::vector<Particle*>(maxJ));
+    for (int i = 0; i < maxI; ++i) {
+        for (int j = 0; j < maxJ; ++j) {
+            // float m_aux = Simulation::m;
+            float m_aux = i == (maxI-1)? -1 : Simulation::m;
+            particlesMesh[i][j] = new Particle(Eigen::Vector3f(Simulation::d*j*1.25f, Simulation::d*i*1.25f, 0.0f),
+                                               Eigen::Vector3f(0.0f,0.0f,0.0f),
+                                               m_aux, Simulation::e, Simulation::u);
+        }
+    }
+    for (int i = 0; i < maxI; ++i) {
+        for (int j = 0; j < maxJ; ++j) {
+            Particle* c = particlesMesh[i][j];
+            particles.push_back(c);
+            //cross
+            if(i - 1 > 0) {
+                c->addParticle(particlesMesh[i - 1][j], Simulation::d);
+            }
+            if(i + 1 < maxI) {
+                c->addParticle(particlesMesh[i + 1][j], Simulation::d);
+            }
+            if(j - 1 > 0) {
+                c->addParticle(particlesMesh[i][j - 1], Simulation::d);
+            }
+            if(j + 1 < maxJ) {
+                c->addParticle(particlesMesh[i][j + 1], Simulation::d);
+            }
+
+            //2*cross
+            if(i - 2 > 0) {
+                c->addParticle(particlesMesh[i - 2][j], Simulation::d*2.0f);
+            }
+            if(i + 2 < maxI) {
+                c->addParticle(particlesMesh[i + 2][j], Simulation::d*2.0f);
+            }
+            if(j - 2 > 0) {
+                c->addParticle(particlesMesh[i][j - 2], Simulation::d*2.0f);
+            }
+            if(j + 2 < maxJ) {
+                c->addParticle(particlesMesh[i][j + 2], Simulation::d*2.0f);
+            }
+
+            //diagonal
+            if(i - 1 > 0 and j - 1 > 0) {
+                c->addParticle(particlesMesh[i - 1][j - 1], Simulation::d*1.4143f);
+            }
+            if(i + 1 < maxI and j + 1 < maxJ) {
+                c->addParticle(particlesMesh[i + 1][j + 1], Simulation::d*1.4143f);
+            }
+            if(j - 1 > 0 and i + 1 < maxI) {
+                c->addParticle(particlesMesh[i + 1][j - 1], Simulation::d*1.4143f);
+            }
+            if(j + 1 < maxJ and i - 1 > 0) {
+                c->addParticle(particlesMesh[i - 1][j + 1], Simulation::d*1.4143f);
+            }
+        }
+    }
+}
+
+bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
+{
+    float rx = 0.75f;
+    float ry = 0.3f;
+    float rz = 0.75f;
+    std::vector<float> box;
+    std::vector<unsigned int> boxi;
+    box = {
+        -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
+        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+    };
+
+    boxi = {0,1,2,3};
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla,
+                         Eigen::Vector3f(0.0f, 1.0f, 0.0f),
+                         Eigen::Vector3f(0.0f, 0.25f, 0.0f),
+                         Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
+    objects.first.push_back(a);
+
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere,
+                           Eigen::Vector3f(0.2f,0.5f,1.0f),
+                           Eigen::Vector3f(0.5f,0.5f,0.125f),
+                           Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
+    objects.first.push_back(s);
+
+    generateCloth(objects.second, 10, 10);
+
+    return true;
+}
+
 
 bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
 {
@@ -277,6 +370,10 @@ bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& obj
     case ScenaryType::CurlyString:
         Simulation::liveTime = 1000000000;
         result = stringCurly(objects);
+        break;
+    case ScenaryType::Cloth:
+        Simulation::liveTime = 1000000000;
+        result = createCloth(objects);
         break;
     case ScenaryType::Cascade:
     case ScenaryType::Fountain:

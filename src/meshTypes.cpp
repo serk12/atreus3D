@@ -22,7 +22,7 @@ void calculateNormal(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const E
 
 inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const float r = 0.0f)
 {
-    float d_aux = d + (r*n).norm();
+    float d_aux = d - (r*n).norm();
     return (n.dot(p) + d_aux) * (n.dot(p_pass) + d_aux) <= 0.0f;
 }
 
