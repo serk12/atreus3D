@@ -266,9 +266,9 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
     std::vector< std::vector<Particle* > > particlesMesh(maxI, std::vector<Particle*>(maxJ));
     for (int i = 0; i < maxI; ++i) {
         for (int j = 0; j < maxJ; ++j) {
-            // float m_aux = Simulation::m;
-            float m_aux = i == (maxI-1)? -1 : Simulation::m;
-            particlesMesh[i][j] = new Particle(Eigen::Vector3f(Simulation::d*j*1.25f, Simulation::d*i*1.25f, 0.0f),
+            float m_aux = Simulation::m;
+            // float m_aux = i == (maxI-1)? -1 : Simulation::m;
+            particlesMesh[i][j] = new Particle(Eigen::Vector3f(-Simulation::d*maxJ*0.5f + Simulation::d*j*1.0f,  1.0f,-Simulation::d*maxI*0.5f + Simulation::d*i*1.0f),
                                                Eigen::Vector3f(0.0f,0.0f,0.0f),
                                                m_aux, Simulation::e, Simulation::u);
         }
@@ -345,8 +345,8 @@ bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 
     Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere,
                            Eigen::Vector3f(0.2f,0.5f,1.0f),
-                           Eigen::Vector3f(0.5f,0.5f,0.125f),
-                           Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
+                           Eigen::Vector3f(0.0f,0.25f,0.0f),
+                           Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.30f);
     objects.first.push_back(s);
 
     generateCloth(objects.second, 10, 10);
