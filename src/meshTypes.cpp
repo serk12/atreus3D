@@ -63,7 +63,7 @@ bool Sphere::isColliding(Object &object) const
         Eigen::Vector3f P = object.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
         Eigen::Vector3f n = (P - c).normalized();
         float d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
-        object.correctObject(n, d);
+        object.correctObject(n, d, true);
     }
     return false;
 }
@@ -113,7 +113,7 @@ bool Triangle::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
     if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and (areaTrangle(object.getPosition(), B, C) + areaTrangle(A, object.getPosition(), C) + areaTrangle(A, B, object.getPosition()) - area <= 0.01f)) {
-        object.correctObject(n, d);
+        object.correctObject(n, d, false);
         return true;
     }
     return false;
@@ -156,7 +156,7 @@ bool Plane::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
     if(planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius())) {
-        object.correctObject(n, d);
+        object.correctObject(n, d, false);
         return true;
     }
     return false;

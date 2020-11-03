@@ -3,13 +3,13 @@
 
 #define GENERAL_E 0.0f  // bouncing
 #define GENERAL_U 0.0f  // friction
-#define GENERAL_M 0.05f // Mass
+#define GENERAL_M 0.02f // Mass
 #define GENERAL_R 0.0175f// radius
 #define GENERAL_D 0.1f   // spring distance
 #define GENERAL_RM 1.0f  // sphere radius
 #define GENERAL_K_D 0.90f // verlet
-#define GENERAL_K_ELAS 3.5f // spring elasticity
-#define GENERAL_K_DUMP 0.5f // spring dumping
+#define GENERAL_K_ELAS 0.75f // spring elasticity
+#define GENERAL_K_DUMP 0.15f // spring dumping
 #define GENERAL_LIVE_TIME 100000
 #define GENERAL_BIRTH_TIME 100
 #define GENERAL_MAX_PARTICLES 500

@@ -235,9 +235,10 @@ void Object::update(const float deltatime, const std::list<Object*>& meshs)
     }
 }
 
-void Object::correctObject(const Eigen::Vector3f& n, const float d)
+void Object::correctObject(const Eigen::Vector3f& n, const float d, bool add)
 {
-    float d_aux = d - (this->getRadius()*n).norm();
+    float d_aux = (this->getRadius()*n).norm();
+    d_aux = d + (add? d_aux : -d_aux);
     Eigen::Vector3f vt = v - ((n.dot(v)) * n);
     v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
     p = p - (1.0f + e) * (n.dot(p)+d_aux) * n;

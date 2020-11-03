@@ -266,8 +266,9 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
     std::vector< std::vector<Particle* > > particlesMesh(maxI, std::vector<Particle*>(maxJ));
     for (int i = 0; i < maxI; ++i) {
         for (int j = 0; j < maxJ; ++j) {
-            float m_aux = Simulation::m;
+            // float m_aux = Simulation::m;
             // float m_aux = i == (maxI-1)? -1 : Simulation::m;
+            float m_aux = (i == (maxI-1) and (j == (maxJ-1) or j == 0))? -1 : Simulation::m;
             particlesMesh[i][j] = new Particle(Eigen::Vector3f(-Simulation::d*maxJ*0.5f + Simulation::d*j*1.0f,  1.0f,-Simulation::d*maxI*0.5f + Simulation::d*i*1.0f),
                                                Eigen::Vector3f(0.0f,0.0f,0.0f),
                                                m_aux, Simulation::e, Simulation::u);
@@ -278,13 +279,13 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
             Particle* c = particlesMesh[i][j];
             particles.push_back(c);
             //cross
-            if(i - 1 > 0) {
+            if(i - 1 >= 0) {
                 c->addParticle(particlesMesh[i - 1][j], Simulation::d);
             }
             if(i + 1 < maxI) {
                 c->addParticle(particlesMesh[i + 1][j], Simulation::d);
             }
-            if(j - 1 > 0) {
+            if(j - 1 >= 0) {
                 c->addParticle(particlesMesh[i][j - 1], Simulation::d);
             }
             if(j + 1 < maxJ) {
@@ -292,13 +293,13 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
             }
 
             //2*cross
-            if(i - 2 > 0) {
+            if(i - 2 >= 0) {
                 c->addParticle(particlesMesh[i - 2][j], Simulation::d*2.0f);
             }
             if(i + 2 < maxI) {
                 c->addParticle(particlesMesh[i + 2][j], Simulation::d*2.0f);
             }
-            if(j - 2 > 0) {
+            if(j - 2 >= 0) {
                 c->addParticle(particlesMesh[i][j - 2], Simulation::d*2.0f);
             }
             if(j + 2 < maxJ) {
@@ -306,16 +307,16 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
             }
 
             //diagonal
-            if(i - 1 > 0 and j - 1 > 0) {
+            if(i - 1 >= 0 and j - 1 >= 0) {
                 c->addParticle(particlesMesh[i - 1][j - 1], Simulation::d*1.4143f);
             }
             if(i + 1 < maxI and j + 1 < maxJ) {
                 c->addParticle(particlesMesh[i + 1][j + 1], Simulation::d*1.4143f);
             }
-            if(j - 1 > 0 and i + 1 < maxI) {
+            if(j - 1 >= 0 and i + 1 < maxI) {
                 c->addParticle(particlesMesh[i + 1][j - 1], Simulation::d*1.4143f);
             }
-            if(j + 1 < maxJ and i - 1 > 0) {
+            if(j + 1 < maxJ and i - 1 >= 0) {
                 c->addParticle(particlesMesh[i - 1][j + 1], Simulation::d*1.4143f);
             }
         }
