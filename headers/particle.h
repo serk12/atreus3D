@@ -9,6 +9,7 @@
 class Particle : public Object {
 public:
     Particle();
+    virtual ~Particle() {};
     Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u);
     Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
              const std::list<Particle*> links, const std::list<float> linksDistance);

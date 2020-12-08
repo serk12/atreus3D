@@ -2,6 +2,8 @@
 #include <iostream>
 #include "particle.h"
 
+// https://imdoingitwrong.wordpress.com/tag/sph/
+
 Particle::Particle() : Particle(ShaderType::Sphere, Eigen::Vector3f(0.2f, 0.6f, 0.5f),
                                 Eigen::Vector3f(0.0f, 0.0f, 0.0f),
                                 Eigen::Vector3f(0.0002f, 0.0f, 0.0f), 0.05f, 0.96f, 0.670f) {}

@@ -3,10 +3,12 @@
 
 #include "mesh.h"
 #include "utils.h"
+#include <iostream>
 
 class Sphere : public Mesh {
 public:
     Sphere();
+    virtual ~Sphere() {}
     Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r);
 
@@ -22,6 +24,7 @@ private:
 class Triangle : public Mesh {
 public:
     Triangle();
+    virtual ~Triangle() {}
     Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,  const GLenum type);
 
@@ -38,6 +41,7 @@ private:
 class Plane : public Mesh {
 public:
     Plane();
+    virtual ~Plane() {}
     Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
 
@@ -53,6 +57,7 @@ private:
 class Polygon : public Mesh {
 public:
     Polygon();
+    virtual ~Polygon() {}
     Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
 
