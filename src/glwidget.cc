@@ -100,8 +100,8 @@ void GLWidget::paintGL()
 
     if (initialized) {
         Object::cameraMatrixCalc(camera_);
-        float currentTime = frameTime.elapsed();
-        float dt = currentTime - previousTime;
+        double currentTime = frameTime.elapsed();
+        double dt = currentTime - previousTime;
         //dt = 3;
         previousTime = currentTime;
 
@@ -230,20 +230,20 @@ void GLWidget::setBirthTime(int value) {
 }
 
 
-void GLWidget::updeteElasticityTerms(float k_elas) {
+void GLWidget::updeteElasticityTerms(double k_elas) {
     for (Particle* &p : objects.second) {
         p->setElasticityTerm(k_elas);
     }
 }
 
 
-void GLWidget::updeteDumpingTerms(float k_dump) {
+void GLWidget::updeteDumpingTerms(double k_dump) {
     for (Particle* &p : objects.second) {
         p->setDampingTerm(k_dump);
     }
 }
 
-void GLWidget::updeteDistanceTerms(float d) {
+void GLWidget::updeteDistanceTerms(double d) {
     for (Particle* &p : objects.second) {
         p->setDistancyTerm(d);
     }

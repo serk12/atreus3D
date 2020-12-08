@@ -26,9 +26,9 @@ public:
     void cleanScenary();
     void loadScenary();
     void setBirthTime(int value);
-    void updeteElasticityTerms(float k_elas);
-    void updeteDumpingTerms(float k_dump);
-    void updeteDistanceTerms(float d);
+    void updeteElasticityTerms(double k_elas);
+    void updeteDumpingTerms(double k_dump);
+    void updeteDistanceTerms(double d);
 
 public slots:
     void cleanup();
@@ -48,12 +48,12 @@ private:
     void updateFPS();
     QElapsedTimer frameTime;
     QTimer *fpsTimer, *birdTimer;
-    float previousTime = 0.0f;
+    double previousTime = 0.0f;
     int frameCounter = 0;
 
     //OpenGL initialization
     data_visualization::Camera camera_;
-    float width_, height_;
+    double width_, height_;
     bool initialized = false;
 
     //objects = meshes, particles

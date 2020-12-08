@@ -138,16 +138,19 @@ void Object::renderType(int type) const
     unsigned int program = programsList[int(shaderType)];
     glUseProgram(program);
 
-    glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, Object::lightColor.data());
-    glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, objectColor.data());
+    Eigen::Vector3f vaux = Object::lightColor.cast<float>();
+    glUniform3fv(glGetUniformLocation(program, "lightColor"), 1, vaux.data());
+    vaux = objectColor.cast<float>();
+    glUniform3fv(glGetUniformLocation(program, "objectColor"), 1, vaux.data());
+    Eigen::Matrix4f aux = Object::view.cast<float>();
+    glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, aux.data());
+    aux = Object::projection.cast<float>();
+    glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, aux.data());
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, Object::view.data());    
-    glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, Object::projection.data());
-
-    Eigen::Affine3f translation;
+    Eigen::Affine3d translation;
     translation.matrix() = Object::model;
     translation.translation() = p;
-    Eigen::Matrix4f modelObject = translation.matrix();
+    Eigen::Matrix4f modelObject = translation.matrix().cast<float>();
     glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, modelObject.data());
 
     switch (shaderType) {
@@ -173,25 +176,25 @@ void Object::load()
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertices.size(), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(double)*vertices.size(), &vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indices.size(), &indices[0], GL_STATIC_DRAW);
 
     // set position to location = 0
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(double), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 
-void Object::solver(const float dtMs)
+void Object::solver(const double dtMs)
 {
-    float dt = dtMs/1000.0f;
+    double dt = dtMs/1000.0f;
 
-    Eigen::Vector3f aux_p = p;
-    Eigen::Vector3f aux_v = v;
+    Eigen::Vector3d aux_p = p;
+    Eigen::Vector3d aux_v = v;
     switch(solverType) {
     case SolverType::Euler:
         p = p + dt*v;
@@ -221,12 +224,12 @@ void Object::initSolver()
     if (m == -1) physicsType = PhysicsType::Immovable;
     else if (m == -2) physicsType = PhysicsType::Transparent;
     w_i = (m < 0.0f)? 0.0f : 1.0f/m;
-    f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+    f = Eigen::Vector3d(0.0f, 0.0f, 0.0f);
     p_pass = p - (v * 0.016f);
     v_pass = v;
 }
 
-void Object::update(const float deltatime, const std::list<Object*>& meshs)
+void Object::update(const double deltatime, const std::list<Object*>& meshs)
 {
     solver(deltatime);
     bool result = collisionDetect(meshs);
@@ -235,52 +238,52 @@ void Object::update(const float deltatime, const std::list<Object*>& meshs)
     }
 }
 
-void Object::correctObject(const Eigen::Vector3f& n, const float d, bool add)
+void Object::correctObject(const Eigen::Vector3d& n, const double d, bool add)
 {
-    float d_aux = (this->getRadius()*n).norm();
+    double d_aux = (this->getRadius()*n).norm();
     d_aux = d + (add? d_aux : -d_aux);
-    Eigen::Vector3f vt = v - ((n.dot(v)) * n);
+    Eigen::Vector3d vt = v - ((n.dot(v)) * n);
     v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
     p = p - (1.0f + e) * (n.dot(p)+d_aux) * n;
     p_pass = p - (v * 0.016f);
 }
 
-float Object::getWeight() const
+double Object::getWeight() const
 {
     return m;
 }
 
-float Object::getIWeight() const
+double Object::getIWeight() const
 {
     return w_i;
 }
 
-float Object::getElasticity() const
+double Object::getElasticity() const
 {
     return e;
 }
 
-float Object::getFriction() const
+double Object::getFriction() const
 {
     return u;
 }
 
-Eigen::Vector3f Object::getPosition() const
+Eigen::Vector3d Object::getPosition() const
 {
     return p;
 }
 
-Eigen::Vector3f Object::getPassPosition() const
+Eigen::Vector3d Object::getPassPosition() const
 {
     return p_pass;
 }
 
-Eigen::Vector3f Object::getVelocity() const
+Eigen::Vector3d Object::getVelocity() const
 {
     return v;
 }
 
-Eigen::Vector3f Object::getPassVelocity() const
+Eigen::Vector3d Object::getPassVelocity() const
 {
     return v_pass;
 }
@@ -290,13 +293,13 @@ void Object::setSolverModel(SolverType solverType)
     Object::solverType = solverType;
 }
 
-void Object::setGravityScale(const float scale)
+void Object::setGravityScale(const double scale)
 {
     Object::gravityScale = scale;
     Object::gravity = Object::gravityScale * GENERAL_GRAVITY;
 }
 
-void Object::setKd(float kd)
+void Object::setKd(double kd)
 {
     Object::k_d = kd;
 }

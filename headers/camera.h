@@ -165,14 +165,14 @@ class Camera {
    * @brief SetIdentity Returns an identity matrix.
    * @return An identity matrix.
    */
-  Eigen::Matrix4f SetIdentity() const;
+  Eigen::Matrix4d SetIdentity() const;
 
   /**
    * @brief SetModel Returns a model transform matrix that centers the last
    * "updated" model and scales its bounding box longest edge to unit length.
    * @return A modeling transform.
    */
-  Eigen::Matrix4f SetModel() const;
+  Eigen::Matrix4d SetModel() const;
 
   /**
    * @brief SetView Computed the viewing matrix given the rotation_x_ around the
@@ -180,7 +180,7 @@ class Camera {
    * pan_y_) and a zoom out of distance_.
    * @return A viewing transform.
    */
-  Eigen::Matrix4f SetView() const;
+  Eigen::Matrix4d SetView() const;
 
   /**
    * @brief SetProjection Computes the projection matrix for a perspective
@@ -190,14 +190,14 @@ class Camera {
    * @param zfar Far plane Z for a perspective camera.
    * @return A perspective camera matrix transform.
    */
-  Eigen::Matrix4f SetProjection(double fov, double znear, double zfar);
+  Eigen::Matrix4d SetProjection(double fov, double znear, double zfar);
 
   /**
    * @brief SetProjection Computes the projection matrix for a perspective
    * camera, using the stored parameters.
    * @return A perspective camera matrix transform.
    */
-  Eigen::Matrix4f SetProjection() const;
+  Eigen::Matrix4d SetProjection() const;
 
   /**
    * @brief Zoom Zooms the camera in the direction given by the modifier.
@@ -233,7 +233,7 @@ class Camera {
    * @param min Minimum point of the model bounding box.
    * @param max Maximum point of the model bounding box.
    */
-  void UpdateModel(Eigen::Vector3f min, Eigen::Vector3f max);
+  void UpdateModel(Eigen::Vector3d min, Eigen::Vector3d max);
 
   /**
    * @brief SetRotationX If rotating is active, rotates the camera around the X

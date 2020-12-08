@@ -14,8 +14,8 @@ namespace data_visualization {
 
 namespace {
 
-const Eigen::Vector3f vra(0.0, 1.0, 0.0);
-const Eigen::Vector3f hra(1.0, 0.0, 0.0);
+const Eigen::Vector3d vra(0.0, 1.0, 0.0);
+const Eigen::Vector3d hra(1.0, 0.0, 0.0);
 
 }  //  namespace
 
@@ -56,33 +56,33 @@ void Camera::SetViewport() const {
   glViewport(viewport_x_, viewport_y_, viewport_width_, viewport_height_);
 }
 
-Eigen::Matrix4f Camera::SetIdentity() const {
-  Eigen::Matrix4f identity;
+Eigen::Matrix4d Camera::SetIdentity() const {
+  Eigen::Matrix4d identity;
   identity << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   return identity;
 }
 
-Eigen::Matrix4f Camera::SetModel() const {
-  const Eigen::Affine3f kScaling(Eigen::Scaling(
-      Eigen::Vector3d(scaling_, scaling_, scaling_).cast<float>()));
-  const Eigen::Affine3f kTranslation(Eigen::Translation3f(
-      Eigen::Vector3d(centering_x_, centering_y_, centering_z_).cast<float>()));
+Eigen::Matrix4d Camera::SetModel() const {
+  const Eigen::Affine3d kScaling(Eigen::Scaling(
+      Eigen::Vector3d(scaling_, scaling_, scaling_).cast<double>()));
+  const Eigen::Affine3d kTranslation(Eigen::Translation3d(
+      Eigen::Vector3d(centering_x_, centering_y_, centering_z_).cast<double>()));
 
   return kScaling.matrix() * kTranslation.matrix();
 }
 
-Eigen::Matrix4f Camera::SetView() const {
-  const Eigen::Affine3f kTranslation(Eigen::Translation3f(
-      Eigen::Vector3d(pan_x_, pan_y_, -distance_).cast<float>()));
-  const Eigen::Affine3f kRotationA(
-      Eigen::AngleAxisf(static_cast<float>(rotation_x_), hra));
-  const Eigen::Affine3f kRotationB(
-      Eigen::AngleAxisf(static_cast<float>(rotation_y_), vra));
+Eigen::Matrix4d Camera::SetView() const {
+  const Eigen::Affine3d kTranslation(Eigen::Translation3d(
+      Eigen::Vector3d(pan_x_, pan_y_, -distance_).cast<double>()));
+  const Eigen::Affine3d kRotationA(
+      Eigen::AngleAxisd(static_cast<double>(rotation_x_), hra));
+  const Eigen::Affine3d kRotationB(
+      Eigen::AngleAxisd(static_cast<double>(rotation_y_), vra));
 
   return kTranslation.matrix() * kRotationA.matrix() * kRotationB.matrix();
 }
 
-Eigen::Matrix4f Camera::SetProjection(double fov, double znear, double zfar) {
+Eigen::Matrix4d Camera::SetProjection(double fov, double znear, double zfar) {
   field_of_view_ = fov;
   z_near_ = znear;
   z_far_ = zfar;
@@ -90,16 +90,16 @@ Eigen::Matrix4f Camera::SetProjection(double fov, double znear, double zfar) {
   return SetProjection();
 }
 
-Eigen::Matrix4f Camera::SetProjection() const {
+Eigen::Matrix4d Camera::SetProjection() const {
   const double kAR = static_cast<double>(viewport_width_) /
                      static_cast<double>(viewport_height_);
   glm::dmat4x4 glm_perspective =
       glm::perspective((field_of_view_ * M_PI / 180.0), kAR, z_near_, z_far_);
 
-  Eigen::Matrix4f eigen_perspective;
+  Eigen::Matrix4d eigen_perspective;
   for (int i = 0; i < 4; ++i)
     for (int j = 0; j < 4; ++j)
-      eigen_perspective(i, j) = static_cast<float>(glm_perspective[j][i]);
+      eigen_perspective(i, j) = static_cast<double>(glm_perspective[j][i]);
 
   return eigen_perspective;
 }
@@ -131,13 +131,13 @@ void Camera::Rotate(double modifier) {
   rotation_y_ += AngleIncrement * modifier;
 }
 
-void Camera::UpdateModel(Eigen::Vector3f min, Eigen::Vector3f max) {
+void Camera::UpdateModel(Eigen::Vector3d min, Eigen::Vector3d max) {
   Eigen::Vector3d center = (min + max).cast<double>() / 2.0;
   centering_x_ = -center[0];
   centering_y_ = -center[1];
   centering_z_ = -center[2];
 
-  float longest_edge =
+  double longest_edge =
       std::max(max[0] - min[0], std::max(max[1] - min[1], max[2] - min[2]));
   scaling_ = 1.0 / static_cast<double>(longest_edge);
 }

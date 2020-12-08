@@ -7,56 +7,56 @@
 class Sphere : public Mesh {
 public:
     Sphere();
-    Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
-    Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r);
+    Sphere(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m);
+    Sphere(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const double r);
 
-    float getRadius() const final;
+    double getRadius() const final;
     bool isColliding(Object& object) const final;
 
 private:
-    float r = GENERAL_RM;
-    float r2 = r*r;
+    double r = GENERAL_RM;
+    double r2 = r*r;
 };
 
 
 class Triangle : public Mesh {
 public:
     Triangle();
-    Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
-    Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,  const GLenum type);
+    Triangle(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m);
+    Triangle(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u,  const GLenum type);
 
-    float getRadius() const final;
+    double getRadius() const final;
     bool isColliding(Object& object) const final;
 
 private:
-    Eigen::Vector3f n, A, B, C;
-    float d;
-    float area;
+    Eigen::Vector3d n, A, B, C;
+    double d;
+    double area;
 };
 
 
 class Plane : public Mesh {
 public:
     Plane();
-    Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
-    Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
+    Plane(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m);
+    Plane(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const GLenum type);
 
-    float getRadius() const final;
+    double getRadius() const final;
     bool isColliding(Object& object) const final;
 
 private:
-    Eigen::Vector3f n;
-    float d;
+    Eigen::Vector3d n;
+    double d;
 };
 
 
 class Polygon : public Mesh {
 public:
     Polygon();
-    Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
-    Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
+    Polygon(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m);
+    Polygon(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const GLenum type);
 
-    float getRadius() const final;
+    double getRadius() const final;
     bool isColliding(Object& object) const final;
 
 private:

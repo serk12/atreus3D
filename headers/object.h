@@ -20,7 +20,7 @@ public:
     virtual void render() const = 0;
     virtual void event(QEvent *event) = 0;
 
-    void update(const float deltatime, const std::list<Object*>& meshs);
+    void update(const double deltatime, const std::list<Object*>& meshs);
     virtual void forceUpdate() = 0;
 
     static void cameraMatrixCalc(data_visualization::Camera camera_);
@@ -30,53 +30,53 @@ public:
     void load();
     virtual bool isColliding(Object& object) const = 0;
 
-    void correctObject(const Eigen::Vector3f& n, const float d, bool add);
+    void correctObject(const Eigen::Vector3d& n, const double d, bool add);
 
-    virtual float getRadius() const = 0;
-    float getWeight() const;
-    float getIWeight() const;
-    float getElasticity() const;
-    float getFriction() const;
-    Eigen::Vector3f getPosition() const;
-    Eigen::Vector3f getPassPosition() const;
-    Eigen::Vector3f getVelocity() const;
-    Eigen::Vector3f getPassVelocity() const;
+    virtual double getRadius() const = 0;
+    double getWeight() const;
+    double getIWeight() const;
+    double getElasticity() const;
+    double getFriction() const;
+    Eigen::Vector3d getPosition() const;
+    Eigen::Vector3d getPassPosition() const;
+    Eigen::Vector3d getVelocity() const;
+    Eigen::Vector3d getPassVelocity() const;
 
     static void setSolverModel(const SolverType solverType);
-    static void setGravityScale(const float scale);
-    static void setKd(float kd);
+    static void setGravityScale(const double scale);
+    static void setKd(double kd);
 
 protected:
     // openGL basic shaders and render vars
-    inline static Eigen::Matrix4f projection, view, model, t, normal;
+    inline static Eigen::Matrix4d projection, view, model, t, normal;
     inline static std::vector<unsigned int> programsList;
 
     unsigned int VAO, VBO, EBO, qttyFaces;
-    Eigen::Vector3f objectColor;
-    std::vector<float> vertices;
+    Eigen::Vector3d objectColor;
+    std::vector<double> vertices;
     std::vector<unsigned int> indices;
 
     static int loadShader(const char * vertex, const char *frag, const char *geo);
     void renderType(int type) const;
 
     // phisics variables
-    inline static float k_d;
-    inline static float gravityScale = GENERAL_GRAVITY_SCALE;
-    inline static Eigen::Vector3f gravity = gravityScale * GENERAL_GRAVITY;
+    inline static double k_d;
+    inline static double gravityScale = GENERAL_GRAVITY_SCALE;
+    inline static Eigen::Vector3d gravity = gravityScale * GENERAL_GRAVITY;
 
-    Eigen::Vector3f p, p_pass, v, v_pass, f;
-    float w_i, m, e, u;
+    Eigen::Vector3d p, p_pass, v, v_pass, f;
+    double w_i, m, e, u;
     inline static SolverType solverType;
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
 
     virtual bool collisionDetect(const std::list<Object*>& objects) = 0;
     virtual void propagateCollision(const std::list<Object*>& meshs) = 0;
-    void solver(const float dt);
+    void solver(const double dt);
     void initSolver();
 
 private:
-    inline static Eigen::Vector3f lightColor = GENERAL_LIGHT;
+    inline static Eigen::Vector3d lightColor = GENERAL_LIGHT;
 
 };
 

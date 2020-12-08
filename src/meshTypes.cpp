@@ -6,10 +6,10 @@
 // GENERAL //
 // ******* //
 
-void calculateNormal(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C, Eigen::Vector3f& n, float& d)
+void calculateNormal(const Eigen::Vector3d& A, const Eigen::Vector3d& B, const Eigen::Vector3d& C, Eigen::Vector3d& n, double& d)
 {
-    Eigen::Vector3f AB = B - A;
-    Eigen::Vector3f AC = C - A;
+    Eigen::Vector3d AB = B - A;
+    Eigen::Vector3d AC = C - A;
 
     n = (AB.cross(AC)).normalized();
     d = -(n.x()*A.x() + n.y()*A.y() + n.z()*A.z());
@@ -20,9 +20,9 @@ void calculateNormal(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const E
     }
 }
 
-inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const float r = 0.0f)
+inline bool planeCrossed(const Eigen::Vector3d& n, const double d, const Eigen::Vector3d& p, const Eigen::Vector3d& p_pass, const double r = 0.0f)
 {
-    float d_aux = d - (r*n).norm();
+    double d_aux = d - (r*n).norm();
     return (n.dot(p) + d_aux) * (n.dot(p_pass) + d_aux) <= 0.0f;
 }
 
@@ -31,17 +31,17 @@ inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::V
 // ****** //
 
 Sphere::Sphere() : Mesh() {}
-Sphere::Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.30f, GL_TRIANGLES) {}
+Sphere::Sphere(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m)
+    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3d(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.30f, GL_TRIANGLES) {}
 
-Sphere::Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r)
+Sphere::Sphere(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const double r)
     : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, GL_POINTS)
 {
     this->r = r;
     this->r2 = r*r;
 }
 
-float Sphere::getRadius() const
+double Sphere::getRadius() const
 {
     return r;
 }
@@ -49,20 +49,20 @@ float Sphere::getRadius() const
 bool Sphere::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
-    Eigen::Vector3f p = object.getPosition();
-    Eigen::Vector3f v = object.getVelocity();
-    float r2o = object.getRadius() * object.getRadius();
-    Eigen::Vector3f c = this->p;
-    Eigen::Vector3f diff_p = p - c;
+    Eigen::Vector3d p = object.getPosition();
+    Eigen::Vector3d v = object.getVelocity();
+    double r2o = object.getRadius() * object.getRadius();
+    Eigen::Vector3d c = this->p;
+    Eigen::Vector3d diff_p = p - c;
     if ((diff_p.transpose() * diff_p) - (this->r2 + r2o) <= 0) {
-        float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
-        float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
-        float dir1 = (-beta+aux_1)/(aux_2);
-        float dir2 = (-beta-aux_1)/(aux_2);
+        double alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
+        double aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
+        double dir1 = (-beta+aux_1)/(aux_2);
+        double dir2 = (-beta-aux_1)/(aux_2);
         if (std::isnan(dir1) && std::isnan(dir2)) return false;
-        Eigen::Vector3f P = object.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
-        Eigen::Vector3f n = (P - c).normalized();
-        float d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
+        Eigen::Vector3d P = object.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
+        Eigen::Vector3d n = (P - c).normalized();
+        double d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
         object.correctObject(n, d, true);
     }
     return false;
@@ -72,39 +72,39 @@ bool Sphere::isColliding(Object &object) const
 // TRIANGLE //
 // ******** //
 
-inline float areaTrangle(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C)
+inline double areaTrangle(const Eigen::Vector3d& A, const Eigen::Vector3d& B, const Eigen::Vector3d& C)
 {
-    Eigen::Vector3f BA = (B - A);
-    Eigen::Vector3f CA = (C - A);
+    Eigen::Vector3d BA = (B - A);
+    Eigen::Vector3d CA = (C - A);
 
     return (BA.cross(CA)).norm()*0.5f;
 }
 
 Triangle::Triangle() : Mesh() {}
-Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.60f, GL_TRIANGLES)
+Triangle::Triangle(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m)
+    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3d(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.60f, GL_TRIANGLES)
 {
-    this->A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
-    this->B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
-    this->C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
+    this->A = Eigen::Vector3d(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
+    this->B = Eigen::Vector3d(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
+    this->C = Eigen::Vector3d(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
 
     calculateNormal(A,B,C, n, d);
     area = areaTrangle(A, B, C);
 }
 
-Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
+Triangle::Triangle(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const GLenum type)
     : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type)
 {
-    this->A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
-    this->B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
-    this->C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
+    this->A = Eigen::Vector3d(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
+    this->B = Eigen::Vector3d(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
+    this->C = Eigen::Vector3d(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
 
     calculateNormal(A ,B, C, n, d);
     area = areaTrangle(A, B, C);
 }
 
 
-float Triangle::getRadius() const
+double Triangle::getRadius() const
 {
     return 1;
 }
@@ -125,29 +125,29 @@ bool Triangle::isColliding(Object &object) const
 
 
 Plane::Plane() : Mesh() {}
-Plane::Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.50f, GL_TRIANGLES)
+Plane::Plane(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m)
+    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3d(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.50f, GL_TRIANGLES)
 {
-    Eigen::Vector3f A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
-    Eigen::Vector3f B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
-    Eigen::Vector3f C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
+    Eigen::Vector3d A = Eigen::Vector3d(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
+    Eigen::Vector3d B = Eigen::Vector3d(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
+    Eigen::Vector3d C = Eigen::Vector3d(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
 
     calculateNormal(A, B, C, n, d);
 }
 
 
-Plane::Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
+Plane::Plane(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const GLenum type)
     : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type)
 {
-    Eigen::Vector3f A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
-    Eigen::Vector3f B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
-    Eigen::Vector3f C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
+    Eigen::Vector3d A = Eigen::Vector3d(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
+    Eigen::Vector3d B = Eigen::Vector3d(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
+    Eigen::Vector3d C = Eigen::Vector3d(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
 
     calculateNormal(A, B, C, n, d);
 }
 
 
-float Plane::getRadius() const
+double Plane::getRadius() const
 {
     return 1;
 }
@@ -167,13 +167,13 @@ bool Plane::isColliding(Object &object) const
 // ******* //
 
 Polygon::Polygon() : Mesh() {}
-Polygon::Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f, GL_TRIANGLES) {}
+Polygon::Polygon(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m)
+    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3d(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f, GL_TRIANGLES) {}
 
-Polygon::Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
+Polygon::Polygon(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const GLenum type)
     : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type) {}
 
-float Polygon::getRadius() const
+double Polygon::getRadius() const
 {
     return 1;
 }

@@ -7,8 +7,8 @@
 class Mesh : public Object {
 public:
     Mesh();
-    Mesh(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u);
-    Mesh(const std::vector<float> vertices, const std::vector<unsigned int> indices,const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
+    Mesh(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u);
+    Mesh(const std::vector<double> vertices, const std::vector<unsigned int> indices,const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const GLenum type);
 
     void render() const final;
     void event(QEvent *event) final;

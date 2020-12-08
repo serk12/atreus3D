@@ -2,15 +2,15 @@
 #include <iostream>
 #include "particle.h"
 
-Particle::Particle() : Particle(ShaderType::Sphere, Eigen::Vector3f(0.2f, 0.6f, 0.5f),
-                                Eigen::Vector3f(0.0f, 0.0f, 0.0f),
-                                Eigen::Vector3f(0.0002f, 0.0f, 0.0f), 0.05f, 0.96f, 0.670f) {}
+Particle::Particle() : Particle(ShaderType::Sphere, Eigen::Vector3d(0.2f, 0.6f, 0.5f),
+                                Eigen::Vector3d(0.0f, 0.0f, 0.0f),
+                                Eigen::Vector3d(0.0002f, 0.0f, 0.0f), 0.05f, 0.96f, 0.670f) {}
 
-Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u) {}
+Particle::Particle(const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u) : Particle(ShaderType::Sphere, Eigen::Vector3d(0.6f, 0.2f, 0.5f), p, v, m, e, u) {}
 
-Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const Eigen::Vector3f c) : Particle(ShaderType::Sphere, c, p, v, m, e, u) {}
+Particle::Particle(const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const Eigen::Vector3d c) : Particle(ShaderType::Sphere, c, p, v, m, e, u) {}
 
-Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
+Particle::Particle(const ShaderType programIndex, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u)
 {
     this->shaderType = programIndex;
     this->objectColor = color;
@@ -27,27 +27,27 @@ Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, c
     initSolver();
 }
 
-Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
-                   const std::list<Particle*> links, const std::list<float> linksDistance) : Particle(programIndex, color, p, v, m, e, u)
+Particle::Particle(const ShaderType programIndex, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u,
+                   const std::list<Particle*> links, const std::list<double> linksDistance) : Particle(programIndex, color, p, v, m, e, u)
 {
     this->links = std::list<Particle*>(links);
-    this->linksDistance = std::list<float>(linksDistance);
+    this->linksDistance = std::list<double>(linksDistance);
 }
-Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
-                   const std::list<Particle*> links, const std::list<float> linksDistance) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u)
+Particle::Particle(const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u,
+                   const std::list<Particle*> links, const std::list<double> linksDistance) : Particle(ShaderType::Sphere, Eigen::Vector3d(0.6f, 0.2f, 0.5f), p, v, m, e, u)
 {
     this->links = std::list<Particle*>(links);
-    this->linksDistance = std::list<float>(linksDistance);
+    this->linksDistance = std::list<double>(linksDistance);
 }
 
 
-void Particle::addParticle(Particle* &p, const float distance)
+void Particle::addParticle(Particle* &p, const double distance)
 {
     links.push_back(p);
     linksDistance.push_back(distance);
 }
 
-float Particle::getRadius() const
+double Particle::getRadius() const
 {
     return r;
 }
@@ -64,18 +64,18 @@ void Particle::forceUpdate()
 {
     if (physicsType == PhysicsType::Normal) {
         f = gravity*m;
-        std::list<float>::iterator itDis = linksDistance.begin();
+        std::list<double>::iterator itDis = linksDistance.begin();
         for (std::list<Particle*>::iterator it = links.begin(); it != links.end(); ++it, ++itDis) {
             Particle* l = *it;
-            float dis = *itDis;
-            Eigen::Vector3f diff  = p - l->p;
-            Eigen::Vector3f diffV = v - l->v;
-            Eigen::Vector3f direction = diff.normalized();
+            double dis = *itDis;
+            Eigen::Vector3d diff  = p - l->p;
+            Eigen::Vector3d diffV = v - l->v;
+            Eigen::Vector3d direction = diff.normalized();
             f -= (k_elas * (diff.norm() - dis) + (k_damp * diffV.dot(direction))) * direction;
         }
     }
     else {
-        f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+        f = Eigen::Vector3d(0.0f, 0.0f, 0.0f);
     }
 
 }
@@ -94,25 +94,25 @@ bool Particle::collisionDetect(const std::list<Object*>& meshs)
     return result;
 }
 
-void Particle::setDampingTerm(const float k_damp)
+void Particle::setDampingTerm(const double k_damp)
 {
     this->k_damp = k_damp;
 }
 
-void Particle::setElasticityTerm(const float k_elas)
+void Particle::setElasticityTerm(const double k_elas)
 {
     this->k_elas = k_elas;
 }
 
-void Particle::setDistancyTerm(const float d)
+void Particle::setDistancyTerm(const double d)
 {
-    std::list<float>::iterator it = linksDistance.begin();
-    float ref = *it;
+    std::list<double>::iterator it = linksDistance.begin();
+    double ref = *it;
     for (; it != linksDistance.end(); ++it) {
         if (*it != ref) return;
     }
 
-    for (std::list<float>::iterator it = linksDistance.begin(); it != linksDistance.end(); ++it) {
+    for (std::list<double>::iterator it = linksDistance.begin(); it != linksDistance.end(); ++it) {
         *it = d;
     }
 }

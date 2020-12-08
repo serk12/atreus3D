@@ -51,12 +51,12 @@ Simulation::~Simulation()
 
 bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
 {
-    float rx = 0.75f;
-    float ry = 0.3f;
-    float rz = 0.75f;
-    std::vector<float> box;
+    double rx = 0.75f;
+    double ry = 0.3f;
+    double rz = 0.75f;
+    std::vector<double> box;
     std::vector<unsigned int> boxi;
-//    std::vector<float> box = {
+//    std::vector<double> box = {
 //        1.0f*rx,  1.0f*ry,  1.0f*rz, // 0
 //        1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
 //        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
@@ -76,7 +76,7 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
         };
 
     boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3d(0.0f, 1.0f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
     box = {
@@ -85,7 +85,7 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
            -1.0f*rx, -1.0f*ry,  1.0f*rz, // 6
            -1.0f*rx,  1.0f*ry,  1.0f*rz, // 4
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3d(1.0f, 0.0f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
     box = {
@@ -94,7 +94,7 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
         1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
         1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 0.5f, 1.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3d(0.0f, 0.5f, 1.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
     box = {
@@ -103,7 +103,7 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
            -1.0f*rx,  1.0f*ry, -1.0f*rz, // 5
            -1.0f*rx,  1.0f*ry,  1.0f*rz, // 4
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.5f, 0.25f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3d(0.5f, 0.25f, 0.5f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
     box = {
@@ -112,11 +112,11 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
             1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
             1.0f*rx,  1.0f*ry, -1.0f*rz, // 1
         };
-    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
+    a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3d(1.0f, 0.5f, 0.5f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
 
 
-    float r = 1.45f;
+    double r = 1.45f;
     box = {
         0.0f*r, 0.5f*r, 0.0f*r,
         1.0f*r, 0.0f*r, 0.0f*r,
@@ -126,60 +126,60 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
         0,1,2,
         2,1,0,
     };
-    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(-0.75f, -0.50f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
+    Triangle *t = new Triangle(box, boxi, Eigen::Vector3d(-0.75f, -0.50f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1);
     objects.first.push_back(t);
 
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3d(0.2f,0.5f,1.0f),  Eigen::Vector3d(0.0f,0.0f,0.0f), Eigen::Vector3d(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
     objects.first.push_back(s);
 
     return true;
 }
 
-void createString(std::list<Particle*>& particles, Eigen::Vector3f pos, int qttyPar, int id)
+void createString(std::list<Particle*>& particles, Eigen::Vector3d pos, int qttyPar, int id)
 {
-    Particle* aux = new Particle(pos, Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, Simulation::e, Simulation::u);
+    Particle* aux = new Particle(pos, Eigen::Vector3d(0.0f,0.0f,0.0f), -1.0f, Simulation::e, Simulation::u);
     particles.push_back(aux);
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
 
-    float r = dis(gen)-0.5f;
+    double r = dis(gen)-0.5f;
     for (int i = 1; i < qttyPar; ++i) {
-        Particle* c = new Particle(pos + Eigen::Vector3f(0.0f, Simulation::d*i, 0.0f),
-                                   Eigen::Vector3f(0.001f*r, 0.0f*r, 0.001f*r),
-                                   Simulation::m, Simulation::e, Simulation::u, Eigen::Vector3f(0.1f*i, id/10.0f, 0.1f*i));
+        Particle* c = new Particle(pos + Eigen::Vector3d(0.0f, Simulation::d*i, 0.0f),
+                                   Eigen::Vector3d(0.001f*r, 0.0f*r, 0.001f*r),
+                                   Simulation::m, Simulation::e, Simulation::u, Eigen::Vector3d(0.1f*i, id/10.0f, 0.1f*i));
         particles.push_back(c);
         c->addParticle(aux, Simulation::d);
         aux->addParticle(c, Simulation::d);
         aux = c;
     }
 
-    Particle* c = new Particle(pos + Eigen::Vector3f(0.0f, Simulation::d*qttyPar, 0.0f),
-                               Eigen::Vector3f(0.0f,0.0f,0.0f),
+    Particle* c = new Particle(pos + Eigen::Vector3d(0.0f, Simulation::d*qttyPar, 0.0f),
+                               Eigen::Vector3d(0.0f,0.0f,0.0f),
                                Simulation::m, Simulation::e, Simulation::u);
     c->addParticle(aux, Simulation::d);
     aux->addParticle(c, Simulation::d);
     particles.push_back(c);
 }
 
-void creatCurlyHair(std::list<Particle*>& particles, Eigen::Vector3f pos, int qttyPar, int id)
+void creatCurlyHair(std::list<Particle*>& particles, Eigen::Vector3d pos, int qttyPar, int id)
 {
-    Particle* aux = new Particle(pos, Eigen::Vector3f(0.0f,0.0f,0.0f), -1.0f, Simulation::e, Simulation::u);
+    Particle* aux = new Particle(pos, Eigen::Vector3d(0.0f,0.0f,0.0f), -1.0f, Simulation::e, Simulation::u);
     particles.push_back(aux);
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
 
-    float r = dis(gen)-0.5f;
+    double r = dis(gen)-0.5f;
     Particle *aux2 = nullptr;
     Particle *aux3 = nullptr;
 
     for (int i = 1; i < qttyPar; ++i) {
-        Particle* c = new Particle(pos + Eigen::Vector3f(0.0f, Simulation::d*i, 0.0f),
-                                   Eigen::Vector3f(0.001f*r, 0.0f*r, 0.001f*r),
-                                   Simulation::m, Simulation::e, Simulation::u, Eigen::Vector3f(0.1f*i, id/10.0f, 0.1f*i));
+        Particle* c = new Particle(pos + Eigen::Vector3d(0.0f, Simulation::d*i, 0.0f),
+                                   Eigen::Vector3d(0.001f*r, 0.0f*r, 0.001f*r),
+                                   Simulation::m, Simulation::e, Simulation::u, Eigen::Vector3d(0.1f*i, id/10.0f, 0.1f*i));
         particles.push_back(c);
         if(aux3 != nullptr) {
             c->addParticle(aux3, Simulation::d*1.5f);
@@ -197,8 +197,8 @@ void creatCurlyHair(std::list<Particle*>& particles, Eigen::Vector3f pos, int qt
         aux = c;
     }
 
-    Particle* c = new Particle(pos + Eigen::Vector3f(0.0f, Simulation::d*qttyPar, 0.0f),
-                               Eigen::Vector3f(0.0f,0.0f,0.0f),
+    Particle* c = new Particle(pos + Eigen::Vector3d(0.0f, Simulation::d*qttyPar, 0.0f),
+                               Eigen::Vector3d(0.0f,0.0f,0.0f),
                                Simulation::m, Simulation::e, Simulation::u);
     c->addParticle(aux, Simulation::d);
     aux->addParticle(c, Simulation::d);
@@ -207,10 +207,10 @@ void creatCurlyHair(std::list<Particle*>& particles, Eigen::Vector3f pos, int qt
 
 bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
-    float rx = 0.75f;
-    float ry = 0.3f;
-    float rz = 0.75f;
-    std::vector<float> box;
+    double rx = 0.75f;
+    double ry = 0.3f;
+    double rz = 0.75f;
+    std::vector<double> box;
     std::vector<unsigned int> boxi;
     box = {
         -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
@@ -220,28 +220,28 @@ bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
     };
 
     boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, -1.00f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3d(0.0f, 1.0f, 0.0f), Eigen::Vector3d(0.0f, -1.00f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),
-                           Eigen::Vector3f(0.0f,0.2f,0.1f),
-                           Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.5f);
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3d(0.2f,0.5f,1.0f),
+                           Eigen::Vector3d(0.0f,0.2f,0.1f),
+                           Eigen::Vector3d(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.5f);
     objects.first.push_back(s);
 
     int qttyStrings = 3, qttyPar = 10;
-    float gap = 0.15f;
+    double gap = 0.15f;
     for (int j = 0; j < qttyStrings; ++j) {
-        createString(objects.second, Eigen::Vector3f((-qttyStrings*gap*0.5f) + gap*j,1.0f, 0.0f), qttyPar, j);
+        createString(objects.second, Eigen::Vector3d((-qttyStrings*gap*0.5f) + gap*j,1.0f, 0.0f), qttyPar, j);
     }
     return true;
 }
 
 bool stringCurly(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
-    float rx = 0.75f;
-    float ry = 0.3f;
-    float rz = 0.75f;
-    std::vector<float> box;
+    double rx = 0.75f;
+    double ry = 0.3f;
+    double rz = 0.75f;
+    std::vector<double> box;
     std::vector<unsigned int> boxi;
     box = {
         -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
@@ -251,13 +251,13 @@ bool stringCurly(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
     };
 
     boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, -1.00f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3d(0.0f, 1.0f, 0.0f), Eigen::Vector3d(0.0f, -1.00f, 0.0f), Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
     int qttyStrings = 3, qttyPar = 10;
-    float gap = 0.15f;
+    double gap = 0.15f;
     for (int j = 0; j < qttyStrings; ++j) {
-        creatCurlyHair(objects.second, Eigen::Vector3f((-qttyStrings*gap*0.5f) + gap*j,1.0f, 0.0f), qttyPar, j);
+        creatCurlyHair(objects.second, Eigen::Vector3d((-qttyStrings*gap*0.5f) + gap*j,1.0f, 0.0f), qttyPar, j);
     }
     return true;
 }
@@ -266,11 +266,11 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
     std::vector< std::vector<Particle* > > particlesMesh(maxI, std::vector<Particle*>(maxJ));
     for (int i = 0; i < maxI; ++i) {
         for (int j = 0; j < maxJ; ++j) {
-            // float m_aux = Simulation::m;
-            // float m_aux = i == (maxI-1)? -1 : Simulation::m;
-            float m_aux = (i == (maxI-1) and (j == (maxJ-1) or j == 0))? -1 : Simulation::m;
-            particlesMesh[i][j] = new Particle(Eigen::Vector3f(-Simulation::d*maxJ*0.5f + Simulation::d*j*1.0f,  1.0f,-Simulation::d*maxI*0.5f + Simulation::d*i*1.0f),
-                                               Eigen::Vector3f(0.0f,0.0f,0.0f),
+            // double m_aux = Simulation::m;
+            // double m_aux = i == (maxI-1)? -1 : Simulation::m;
+            double m_aux = (i == (maxI-1) and (j == (maxJ-1) or j == 0))? -1 : Simulation::m;
+            particlesMesh[i][j] = new Particle(Eigen::Vector3d(-Simulation::d*maxJ*0.5f + Simulation::d*j*1.0f,  1.0f,-Simulation::d*maxI*0.5f + Simulation::d*i*1.0f),
+                                               Eigen::Vector3d(0.0f,0.0f,0.0f),
                                                m_aux, Simulation::e, Simulation::u);
         }
     }
@@ -325,10 +325,10 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
 
 bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
-    float rx = 0.75f;
-    float ry = 0.3f;
-    float rz = 0.75f;
-    std::vector<float> box;
+    double rx = 0.75f;
+    double ry = 0.3f;
+    double rz = 0.75f;
+    std::vector<double> box;
     std::vector<unsigned int> boxi;
     box = {
         -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
@@ -339,15 +339,15 @@ bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 
     boxi = {0,1,2,3};
     Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla,
-                         Eigen::Vector3f(0.0f, 1.0f, 0.0f),
-                         Eigen::Vector3f(0.0f, 0.25f, 0.0f),
-                         Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
+                         Eigen::Vector3d(0.0f, 1.0f, 0.0f),
+                         Eigen::Vector3d(0.0f, 0.25f, 0.0f),
+                         Eigen::Vector3d(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
     objects.first.push_back(a);
 
     Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere,
-                           Eigen::Vector3f(0.2f,0.5f,1.0f),
-                           Eigen::Vector3f(0.0f,0.25f,0.0f),
-                           Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.30f);
+                           Eigen::Vector3d(0.2f,0.5f,1.0f),
+                           Eigen::Vector3d(0.0f,0.25f,0.0f),
+                           Eigen::Vector3d(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.30f);
     objects.first.push_back(s);
 
     generateCloth(objects.second, 10, 10);
@@ -392,20 +392,20 @@ void Simulation::addParticle(std::list<Particle*>& particleList)
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
-    float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
+    double rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
     Particle *b = nullptr;
     switch (Simulation::scenaryType) {
     case ScenaryType::Cascade:
-        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 0.0f, 2.0f*rz), m, e, u);
+        b = new Particle(Eigen::Vector3d(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3d(2.0f*rx, 0.0f, 2.0f*rz), m, e, u);
         break;
     case ScenaryType::Fountain:
-        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
+        b = new Particle(Eigen::Vector3d(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3d(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
         break;
     case ScenaryType::Rain:
-        b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
+        b = new Particle(Eigen::Vector3d((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3d(0.0f,0.0f,0.0f), m, e, u);
         break;
     case ScenaryType::Debug:
-        b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
+        b = new Particle(Eigen::Vector3d(0.0f, 0.85f, 0.0f), Eigen::Vector3d(0.0f,0.0f,0.0f), m, e, u);
         break;
     default:
         break;
@@ -429,7 +429,7 @@ std::string int2string(int value, int n = 3)
 {
     std::ostringstream out;
     out.precision(n);
-    float div = 10.0f;
+    double div = 10.0f;
     for (int i = 1; i < n; ++i){
         div *= 10.0f;
     }

@@ -33,16 +33,16 @@ public:
     inline static unsigned int birdTime = GENERAL_BIRTH_TIME;
     inline static unsigned int maxParticles = GENERAL_MAX_PARTICLES;
 
-    inline static float gravityScale = GENERAL_GRAVITY_SCALE;
-    inline static float k_d = GENERAL_K_D;
+    inline static double gravityScale = GENERAL_GRAVITY_SCALE;
+    inline static double k_d = GENERAL_K_D;
 
-    inline static float e = GENERAL_E;
-    inline static float u = GENERAL_U;
-    inline static float m = GENERAL_M;
+    inline static double e = GENERAL_E;
+    inline static double u = GENERAL_U;
+    inline static double m = GENERAL_M;
 
-    inline static float k_elas = GENERAL_K_ELAS;
-    inline static float k_dump =  GENERAL_K_DUMP;
-    inline static float d = GENERAL_D;
+    inline static double k_elas = GENERAL_K_ELAS;
+    inline static double k_dump =  GENERAL_K_DUMP;
+    inline static double d = GENERAL_D;
 
     inline static int initiatedScen = 0;
     inline static int initiatedSolv = 0;

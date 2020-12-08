@@ -5,13 +5,13 @@
 
 Mesh::Mesh()
     : Mesh({0.0f, 0.5f, 0.5f,   0.0f, 0.5f, -0.5f,   0.0f, -0.5f, -0.5f,   0.0f, -0.5f,  0.5f},
-           {0, 1, 3, 1, 2, 3, 3, 1, 0, 3, 2, 1}, ShaderType::Vanilla, Eigen::Vector3f(0.6f, 0.2f, 0.6f),
-           Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, -0.0002f, 0.0f), 1.0f, 0.95f, 0.830f, GL_TRIANGLES) {}
+           {0, 1, 3, 1, 2, 3, 3, 1, 0, 3, 2, 1}, ShaderType::Vanilla, Eigen::Vector3d(0.6f, 0.2f, 0.6f),
+           Eigen::Vector3d(0.0f, 1.0f, 0.0f), Eigen::Vector3d(0.0f, -0.0002f, 0.0f), 1.0f, 0.95f, 0.830f, GL_TRIANGLES) {}
 
-Mesh::Mesh(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, e, u, GL_TRIANGLES) {}
+Mesh::Mesh(const std::vector<double> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u)
+    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3d(0.5f, 1.0f, 0.5f), p, v, m, e, u, GL_TRIANGLES) {}
 
-Mesh::Mesh(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
+Mesh::Mesh(const std::vector<double> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3d color, const Eigen::Vector3d p, const Eigen::Vector3d v, const double m, const double e, const double u, const GLenum type)
 {
     this->vertices = vertices;
     this->indices = indices;
