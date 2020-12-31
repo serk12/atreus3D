@@ -18,7 +18,7 @@ class Simulation : public QMainWindow
 {
     Q_OBJECT
 public:
-    enum ScenaryType {Cascade, Rain, Fountain, String, Debug, DebugS, CurlyString, Cloth};
+    enum ScenaryType {Cascade, Rain, Fountain, String, Debug, DebugS, CurlyString, Cloth, RigidBody};
 
     Simulation(QWidget *parent = nullptr);
     ~Simulation();

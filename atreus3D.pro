@@ -17,6 +17,7 @@ SOURCES += \
     src/meshTypes.cpp \
     src/object.cpp \
     src/particle.cc \
+    src/model.cpp \
     src/simulation.cpp
 
 INCLUDEPATH += headers/ \
@@ -29,6 +30,7 @@ HEADERS += \
     headers/glwidget.h \
     headers/mesh.h \
     headers/meshTypes.h \
+    headers/model.h \
     headers/object.h \
     headers/particle.h \
     headers/simulation.h \
@@ -44,8 +46,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     .gitignore \
-    shaders/sphere.frag \
-    shaders/sphere.geo \
-    shaders/sphere.vert \
-    shaders/vanilla.frag \
-    shaders/vanilla.vert
+    shaders/*.geo \
+    shaders/*.frag \
+    shaders/*.vert \
+    models/*.mtl \
+    models/*.obj

@@ -3,6 +3,7 @@
 
 #include "mesh.h"
 #include "utils.h"
+#include "model.h"
 #include <iostream>
 
 class Sphere : public Mesh {
@@ -58,11 +59,14 @@ class Polygon : public Mesh {
 public:
     Polygon();
     virtual ~Polygon() {}
-    Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
-    Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
+    Polygon(const std::string& path, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
+    Polygon(const std::string& path, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
 
     float getRadius() const final;
     bool isColliding(Object& object) const final;
+    void loadModel(const std::string& path);
+
+    Model model;
 
 private:
 

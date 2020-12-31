@@ -167,11 +167,28 @@ bool Plane::isColliding(Object &object) const
 // ******* //
 
 Polygon::Polygon() : Mesh() {}
-Polygon::Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f, GL_TRIANGLES) {}
 
-Polygon::Polygon(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
-    : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type) {}
+Polygon::Polygon(const std::string& path, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
+    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f, GL_TRIANGLES) {
+    this->loadModel(path);
+}
+
+Polygon::Polygon(const std::string& path, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
+    : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type) {
+    this->loadModel(path);
+
+}
+
+void Polygon::loadModel(const std::string& path)
+{
+    model.load(path);
+    this->vertices = std::vector<float>{model.VBO_vertices(),
+                                  model.VBO_vertices() + sizeof(GLfloat)*model.faces().size()*3*3};
+    this->indices = std::vector<unsigned int>(vertices.size());
+    for (unsigned int i = 0; i < indices.size(); ++i) {
+        this->indices[i] = i;
+    }
+}
 
 float Polygon::getRadius() const
 {

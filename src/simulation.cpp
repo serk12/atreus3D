@@ -24,6 +24,7 @@ Simulation::Simulation(QWidget *parent)
     ui->ScenaryType->insertItem(int(ScenaryType::DebugS), "Debug String", ScenaryType::DebugS);
     ui->ScenaryType->insertItem(int(ScenaryType::CurlyString), "Curly String", ScenaryType::CurlyString);
     ui->ScenaryType->insertItem(int(ScenaryType::Cloth), "Cloth", ScenaryType::Cloth);
+    ui->ScenaryType->insertItem(int(ScenaryType::RigidBody), "Rigid Body", ScenaryType::Cloth);
 
     ui->BirdTime->setValue(Simulation::birdTime);
     ui->Kd->setValue(Simulation::k_d*100);
@@ -48,8 +49,7 @@ Simulation::~Simulation()
     delete ui;
 }
 
-
-bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
+void defaultBox(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
 {
     float rx = 0.75f;
     float ry = 0.3f;
@@ -114,8 +114,34 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
         };
     a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(1.0f, 0.5f, 0.5f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f, GL_LINE_STRIP);
     objects.first.push_back(a);
+}
+
+void defaultPlane(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
+{
+    float rx = 0.75f;
+    float ry = 0.3f;
+    float rz = 0.75f;
+    std::vector<float> box;
+    std::vector<unsigned int> boxi;
+    box = {
+        -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
+        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
+        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
+       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
+    };
+
+    boxi = {0,1,2,3};
+    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, -1.00f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
+    objects.first.push_back(a);
+}
 
 
+bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
+{
+    defaultBox(objects);
+
+    std::vector<float> box;
+    std::vector<unsigned int> boxi;
     float r = 1.45f;
     box = {
         0.0f*r, 0.5f*r, 0.0f*r,
@@ -207,21 +233,7 @@ void creatCurlyHair(std::list<Particle*>& particles, Eigen::Vector3f pos, int qt
 
 bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
-    float rx = 0.75f;
-    float ry = 0.3f;
-    float rz = 0.75f;
-    std::vector<float> box;
-    std::vector<unsigned int> boxi;
-    box = {
-        -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
-        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
-        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
-       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
-    };
-
-    boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, -1.00f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
-    objects.first.push_back(a);
+    defaultPlane(objects);
 
     Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),
                            Eigen::Vector3f(0.0f,0.2f,0.1f),
@@ -238,21 +250,7 @@ bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 
 bool stringCurly(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
-    float rx = 0.75f;
-    float ry = 0.3f;
-    float rz = 0.75f;
-    std::vector<float> box;
-    std::vector<unsigned int> boxi;
-    box = {
-        -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
-        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
-        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
-       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
-    };
-
-    boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, -1.00f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
-    objects.first.push_back(a);
+    defaultPlane(objects);
 
     int qttyStrings = 3, qttyPar = 10;
     float gap = 0.15f;
@@ -325,24 +323,7 @@ void generateCloth(std::list<Particle*>& particles, int maxI, int maxJ) {
 
 bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
-    float rx = 0.75f;
-    float ry = 0.3f;
-    float rz = 0.75f;
-    std::vector<float> box;
-    std::vector<unsigned int> boxi;
-    box = {
-        -1.0f*rx, -1.0f*ry,  1.0f*rz,// 6
-        1.0f*rx, -1.0f*ry,  1.0f*rz, // 2
-        1.0f*rx, -1.0f*ry, -1.0f*rz, // 3
-       -1.0f*rx, -1.0f*ry, -1.0f*rz, // 7
-    };
-
-    boxi = {0,1,2,3};
-    Plane *a = new Plane(box, boxi, Object::ShaderType::Vanilla,
-                         Eigen::Vector3f(0.0f, 1.0f, 0.0f),
-                         Eigen::Vector3f(0.0f, 0.25f, 0.0f),
-                         Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1, 0.95f, 0.80f,  GL_LINE_LOOP);
-    objects.first.push_back(a);
+    defaultPlane(objects);
 
     Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere,
                            Eigen::Vector3f(0.2f,0.5f,1.0f),
@@ -355,6 +336,13 @@ bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
     return true;
 }
 
+bool createRigidBody(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects) {
+    Polygon *p = new Polygon("../atreus3D/models/Patricio.obj", Eigen::Vector3f(0.0f,0.25f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1);
+    objects.first.push_back(p);
+    defaultBox(objects);
+    return true;
+}
+
 
 bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
 {
@@ -362,25 +350,28 @@ bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& obj
     Object::setKd(Simulation::k_d);
     Object::setGravityScale(Simulation::gravityScale);
     bool result;
+    Simulation::liveTime = 1000000000;
     switch (Simulation::scenaryType) {
     case ScenaryType::DebugS:
     case ScenaryType::String:
-        Simulation::liveTime = 1000000000;
         result = stringScene(objects);
         break;
     case ScenaryType::CurlyString:
-        Simulation::liveTime = 1000000000;
         result = stringCurly(objects);
         break;
     case ScenaryType::Cloth:
-        Simulation::liveTime = 1000000000;
         result = createCloth(objects);
+        break;
+    case ScenaryType::RigidBody:
+        Simulation::liveTime = GENERAL_LIVE_TIME;
+        result = createRigidBody(objects);
         break;
     case ScenaryType::Cascade:
     case ScenaryType::Fountain:
     case ScenaryType::Debug:
     case ScenaryType::Rain:
     default:
+        Simulation::liveTime = GENERAL_LIVE_TIME;
         result = CubeScene(objects);
         break;
     }
@@ -395,6 +386,7 @@ void Simulation::addParticle(std::list<Particle*>& particleList)
     float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
     Particle *b = nullptr;
     switch (Simulation::scenaryType) {
+    case ScenaryType::RigidBody:
     case ScenaryType::Cascade:
         b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 0.0f, 2.0f*rz), m, e, u);
         break;
@@ -472,10 +464,11 @@ void Simulation::on_Kd_valueChanged(int value)
 void Simulation::on_ScenaryType_currentIndexChanged(int index)
 {
     if (initiatedScen > 1) {
+        initiatedScen = 0;
         Simulation::scenaryType = static_cast<ScenaryType>(index);
         ui->openGLWidget->cleanScenary();
-        usleep(1000000);
         ui->openGLWidget->loadScenary();
+        initiatedScen = 2;
     }
     else{
         ++initiatedScen;
@@ -486,8 +479,10 @@ void Simulation::on_ScenaryType_currentIndexChanged(int index)
 void Simulation::on_SolverMethod_currentIndexChanged(int index)
 {
     if (initiatedSolv > 1) {
+        initiatedScen = 0;
         Simulation::solverType = static_cast<Object::SolverType>(index);
         Object::setSolverModel(solverType);
+        initiatedScen = 2;
     }
     else{
         ++initiatedSolv;

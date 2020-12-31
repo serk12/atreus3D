@@ -10,13 +10,13 @@
 #define GENERAL_K_D 0.90f // verlet
 #define GENERAL_K_ELAS 0.75f // spring elasticity
 #define GENERAL_K_DUMP 0.15f // spring dumping
-#define GENERAL_LIVE_TIME 100000
+#define GENERAL_LIVE_TIME 5000
 #define GENERAL_BIRTH_TIME 100
 #define GENERAL_MAX_PARTICLES 500
 #define GENERAL_GRAVITY_SCALE 0.15f
 
 
-#define GENERAL_SCENARY_TYPE Simulation::ScenaryType::Cloth
+#define GENERAL_SCENARY_TYPE Simulation::ScenaryType::Fountain
 #define GENERAL_SOLVER_TYPE Object::SolverType::Verlet
 
 #define GENERAL_LIGHT Eigen::Vector3f(1.0f, 1.0f, 1.0f)
