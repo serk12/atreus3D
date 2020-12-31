@@ -168,26 +168,46 @@ bool Plane::isColliding(Object &object) const
 
 Polygon::Polygon() : Mesh() {}
 
-Polygon::Polygon(const std::string& path, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f, GL_TRIANGLES) {
-    this->loadModel(path);
+Polygon::Polygon(const std::string& path, const Eigen::Vector3f offSet, const float scale, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
+    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f, loadModel(path, offSet, scale)) {
 }
 
-Polygon::Polygon(const std::string& path, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
-    : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type) {
-    this->loadModel(path);
-
+Polygon::Polygon(const std::string& path, const Eigen::Vector3f offSet, const float scale, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
+    : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, loadModel(path, offSet, scale)) {
 }
 
-void Polygon::loadModel(const std::string& path)
+GLenum Polygon::loadModel(const std::string& path, const Eigen::Vector3f offSet, const float scale)
 {
     model.load(path);
     this->vertices = std::vector<float>{model.VBO_vertices(),
-                                  model.VBO_vertices() + sizeof(GLfloat)*model.faces().size()*3*3};
+                                        model.VBO_vertices() + sizeof(GLfloat)*model.faces().size()*3*3};
+
     this->indices = std::vector<unsigned int>(vertices.size());
-    for (unsigned int i = 0; i < indices.size(); ++i) {
-        this->indices[i] = i;
+
+    std::vector<Face> faces = model.faces();
+    for (unsigned int i = 0; i < faces.size(); ++i) {
+        this->indices[i*3+0] = i*3+0;
+        this->indices[i*3+1] = i*3+1;
+        this->indices[i*3+2] = i*3+2;
     }
+    float maxX, maxY, maxZ, minY, minX, minZ;
+    maxX = minX = vertices[0];
+    maxY = minY = vertices[1];
+    maxZ = minZ = vertices[2];
+    for (unsigned int i = 0; i < vertices.size() / 3; ++i) {
+        vertices[i*3+0] = (vertices[i*3+0] + offSet.x()) / scale;
+        vertices[i*3+1] = (vertices[i*3+1] + offSet.y()) / scale;
+        vertices[i*3+2] = (vertices[i*3+2] + offSet.z()) / scale;
+
+        if (vertices[i*3+0] > maxX) {maxX = vertices[i*3+0];}
+        if (vertices[i*3+1] > maxY) {maxY = vertices[i*3+1];}
+        if (vertices[i*3+2] > maxZ) {maxZ = vertices[i*3+2];}
+
+        if (vertices[i*3+0] < minX) {minX = vertices[i*3+0];}
+        if (vertices[i*3+1] < minY) {minY = vertices[i*3+1];}
+        if (vertices[i*3+2] < minZ) {minZ = vertices[i*3+2];}
+    }
+    return GL_TRIANGLES;
 }
 
 float Polygon::getRadius() const

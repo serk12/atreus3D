@@ -337,7 +337,7 @@ bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 }
 
 bool createRigidBody(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects) {
-    Polygon *p = new Polygon("../atreus3D/models/Patricio.obj", Eigen::Vector3f(0.0f,0.25f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1);
+    Polygon *p = new Polygon("../atreus3D/models/Patricio.obj", Eigen::Vector3f(9.5f,-6.0f,0.0f), 7.0f, Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1);
     objects.first.push_back(p);
     defaultBox(objects);
     return true;
@@ -380,31 +380,33 @@ bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& obj
 
 void Simulation::addParticle(std::list<Particle*>& particleList)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0, 1);
-    float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
-    Particle *b = nullptr;
-    switch (Simulation::scenaryType) {
-    case ScenaryType::RigidBody:
-    case ScenaryType::Cascade:
-        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 0.0f, 2.0f*rz), m, e, u);
-        break;
-    case ScenaryType::Fountain:
-        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
-        break;
-    case ScenaryType::Rain:
-        b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
-        break;
-    case ScenaryType::Debug:
-        b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
-        break;
-    default:
-        break;
-    }
-    if (b != nullptr) {
-        b->load();
-        particleList.push_back(b);
+    if (initiatedScen > 1) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(0, 1);
+        float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
+        Particle *b = nullptr;
+        switch (Simulation::scenaryType) {
+        case ScenaryType::RigidBody:
+        case ScenaryType::Cascade:
+            b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 0.0f, 2.0f*rz), m, e, u);
+            break;
+        case ScenaryType::Fountain:
+            b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
+            break;
+        case ScenaryType::Rain:
+            b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
+            break;
+        case ScenaryType::Debug:
+            b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
+            break;
+        default:
+            break;
+        }
+        if (b != nullptr) {
+            b->load();
+            particleList.push_back(b);
+        }
     }
 }
 
@@ -463,29 +465,35 @@ void Simulation::on_Kd_valueChanged(int value)
 
 void Simulation::on_ScenaryType_currentIndexChanged(int index)
 {
-    if (initiatedScen > 1) {
-        initiatedScen = 0;
+    if (initiatedScen == IndexType::OPEN) {
+        initiatedScen = IndexType::BLOCK;
         Simulation::scenaryType = static_cast<ScenaryType>(index);
         ui->openGLWidget->cleanScenary();
         ui->openGLWidget->loadScenary();
-        initiatedScen = 2;
+        initiatedScen = IndexType::OPEN;
     }
-    else{
-        ++initiatedScen;
+    else if (initiatedScen == IndexType::LOAD){
+        initiatedScen = IndexType::PRELOAD;
+    }
+    else if (initiatedScen == IndexType::PRELOAD) {
+        initiatedScen = IndexType::OPEN;
     }
 }
 
 
 void Simulation::on_SolverMethod_currentIndexChanged(int index)
 {
-    if (initiatedSolv > 1) {
-        initiatedScen = 0;
+    if (initiatedSolv == IndexType::OPEN) {
+        initiatedSolv = IndexType::BLOCK;
         Simulation::solverType = static_cast<Object::SolverType>(index);
         Object::setSolverModel(solverType);
-        initiatedScen = 2;
+        initiatedSolv = IndexType::LOAD;
     }
-    else{
-        ++initiatedSolv;
+    else if (initiatedSolv == IndexType::LOAD){
+        initiatedSolv = IndexType::PRELOAD;
+    }
+    else if (initiatedSolv == IndexType::PRELOAD) {
+        initiatedSolv = IndexType::OPEN;
     }
 }
 

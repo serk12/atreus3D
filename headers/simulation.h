@@ -19,6 +19,7 @@ class Simulation : public QMainWindow
     Q_OBJECT
 public:
     enum ScenaryType {Cascade, Rain, Fountain, String, Debug, DebugS, CurlyString, Cloth, RigidBody};
+    enum IndexType {LOAD, PRELOAD, BLOCK, OPEN};
 
     Simulation(QWidget *parent = nullptr);
     ~Simulation();
@@ -44,8 +45,8 @@ public:
     inline static float k_dump =  GENERAL_K_DUMP;
     inline static float d = GENERAL_D;
 
-    inline static int initiatedScen = 0;
-    inline static int initiatedSolv = 0;
+    inline static IndexType initiatedScen = LOAD;
+    inline static IndexType initiatedSolv = LOAD;
 
 private:
     Ui::Simulation *ui;

@@ -154,8 +154,6 @@ void Object::renderType(int type) const
     case ShaderType::Sphere:
         glUniform1f(glGetUniformLocation(program, "rSphere"), getRadius());
         break;
-    case ShaderType::Vanilla:
-        break;
     default:
         break;
     }
@@ -174,7 +172,6 @@ void Object::load()
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
     if (indices.size() > 0) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indices.size(), &indices[0], GL_STATIC_DRAW);
