@@ -24,6 +24,7 @@ public:
     void event(QEvent *event) final;
     bool isColliding(Object& object) const final;
     float getRadius() const final;
+    float getRadiusSqrt() const final;
     void forceUpdate() final;
 
     void addParticle(Particle* &p, const float distance);
@@ -34,6 +35,7 @@ public:
 private:
     inline static const GLenum TYPE = GL_POINTS;
     inline static const float r = GENERAL_R;
+    inline static const float r2 = GENERAL_R*GENERAL_R;
 
     std::list<Particle*> links;
     std::list<float> linksDistance;

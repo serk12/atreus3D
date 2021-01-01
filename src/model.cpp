@@ -491,3 +491,12 @@ static void ompleVBOs(vector<Face> &_faces,
     }
   }
 }
+
+int Model::getQttyVertices() const
+{
+    return _vertices.size();
+}
+int Model::getQttyFace() const
+{
+    return _faces.size();
+}

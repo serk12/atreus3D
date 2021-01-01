@@ -33,6 +33,7 @@ public:
     void correctObject(const Eigen::Vector3f& n, const float d, bool add);
 
     virtual float getRadius() const = 0;
+    virtual float getRadiusSqrt() const = 0;
     float getWeight() const;
     float getIWeight() const;
     float getElasticity() const;

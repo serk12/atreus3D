@@ -4,6 +4,7 @@
 #include "mesh.h"
 #include "utils.h"
 #include "model.h"
+#include "particle.h"
 #include <iostream>
 
 class Sphere : public Mesh {
@@ -14,6 +15,7 @@ public:
     Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r);
 
     float getRadius() const final;
+    float getRadiusSqrt() const final;
     bool isColliding(Object& object) const final;
 
 private:
@@ -30,7 +32,11 @@ public:
     Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,  const GLenum type);
 
     float getRadius() const final;
+    float getRadiusSqrt() const final;
     bool isColliding(Object& object) const final;
+
+    float r;
+    float r2;
 
 private:
     Eigen::Vector3f n, A, B, C;
@@ -47,6 +53,7 @@ public:
     Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
 
     float getRadius() const final;
+    float getRadiusSqrt() const final;
     bool isColliding(Object& object) const final;
 
 private:
@@ -63,10 +70,12 @@ public:
     Polygon(const std::string& path, const Eigen::Vector3f offSet, const float scale, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u);
 
     float getRadius() const final;
+    float getRadiusSqrt() const final;
     bool isColliding(Object& object) const final;
     GLenum loadModel(const std::string& path, const Eigen::Vector3f offSet, const float scale);
-
+    int pointInPolygon(const Object &object) const;
     Model model;
+    float maxX, maxY, maxZ, minY, minX, minZ, r, r2;
 
 private:
 

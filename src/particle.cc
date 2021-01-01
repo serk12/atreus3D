@@ -54,6 +54,12 @@ float Particle::getRadius() const
     return r;
 }
 
+
+float Particle::getRadiusSqrt() const
+{
+    return r;
+}
+
 void Particle::render() const
 {
     renderType(Particle::TYPE);
@@ -79,7 +85,6 @@ void Particle::forceUpdate()
     else {
         f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
     }
-
 }
 
 bool Particle::isColliding(Object &) const

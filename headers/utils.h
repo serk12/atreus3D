@@ -1,8 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define GENERAL_E 0.0f  // bouncing
-#define GENERAL_U 0.0f  // friction
+#define GENERAL_E 0.5f  // bouncing
+#define GENERAL_U 0.2f  // friction
 #define GENERAL_M 0.02f // Mass
 #define GENERAL_R 0.0175f// radius
 #define GENERAL_D 0.1f   // spring distance
@@ -16,7 +16,7 @@
 #define GENERAL_GRAVITY_SCALE 0.2f
 
 
-#define GENERAL_SCENARY_TYPE Simulation::ScenaryType::Cloth
+#define GENERAL_SCENARY_TYPE Simulation::ScenaryType::RigidBody
 #define GENERAL_SOLVER_TYPE Object::SolverType::Verlet
 
 #define GENERAL_LIGHT Eigen::Vector3f(1.0f, 1.0f, 1.0f)

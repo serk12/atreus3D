@@ -26,6 +26,27 @@ inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::V
     return (n.dot(p) + d_aux) * (n.dot(p_pass) + d_aux) <= 0.0f;
 }
 
+
+inline bool sphereVsSphere(Eigen::Vector3f p1, Eigen::Vector3f p2, float rs1, float rs2)
+{
+    Eigen::Vector3f diff_p = p1 - p2;
+    return (((diff_p.transpose() * diff_p) - (rs1 + rs2)) <= 0);
+}
+
+inline float areaTrangle(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C)
+{
+    Eigen::Vector3f BA = (B - A);
+    Eigen::Vector3f CA = (C - A);
+
+    return (BA.cross(CA)).norm()*0.5f;
+}
+
+inline bool triangleCrossed(const Eigen::Vector3f& n, const float d, const float r, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C, const float area)
+{
+    return planeCrossed(n, d, p, p_pass, r) and (areaTrangle(p, B, C) + areaTrangle(A, p, C) + areaTrangle(A, B, p) - area <= 0.01f);
+}
+
+
 // ****** //
 // SPHERE //
 // ****** //
@@ -46,15 +67,18 @@ float Sphere::getRadius() const
     return r;
 }
 
+float Sphere::getRadiusSqrt() const
+{
+    return this->r2;
+}
+
 bool Sphere::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
     Eigen::Vector3f p = object.getPosition();
-    Eigen::Vector3f v = object.getVelocity();
-    float r2o = object.getRadius() * object.getRadius();
-    Eigen::Vector3f c = this->p;
-    Eigen::Vector3f diff_p = p - c;
-    if ((diff_p.transpose() * diff_p) - (this->r2 + r2o) <= 0) {
+    if (sphereVsSphere(p, this->p, this->r2, object.getRadiusSqrt())) {
+        Eigen::Vector3f c = this->p;
+        Eigen::Vector3f v = object.getVelocity();
         float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
         float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
         float dir1 = (-beta+aux_1)/(aux_2);
@@ -71,14 +95,6 @@ bool Sphere::isColliding(Object &object) const
 // ******** //
 // TRIANGLE //
 // ******** //
-
-inline float areaTrangle(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C)
-{
-    Eigen::Vector3f BA = (B - A);
-    Eigen::Vector3f CA = (C - A);
-
-    return (BA.cross(CA)).norm()*0.5f;
-}
 
 Triangle::Triangle() : Mesh() {}
 Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
@@ -101,12 +117,23 @@ Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned
 
     calculateNormal(A ,B, C, n, d);
     area = areaTrangle(A, B, C);
+
+    r = (A - B).norm();
+    r = (B - C).norm() > r? (B - C).norm() : r;
+    r = (C - A).norm() > r? (C - A).norm() : r;
+    r /= 2.0f;
+    r2 = r*r;
 }
 
 
 float Triangle::getRadius() const
 {
-    return 1;
+    return r;
+}
+
+float Triangle::getRadiusSqrt() const
+{
+    return r2;
 }
 
 bool Triangle::isColliding(Object &object) const
@@ -149,7 +176,12 @@ Plane::Plane(const std::vector<float> vertices, const std::vector<unsigned int> 
 
 float Plane::getRadius() const
 {
-    return 1;
+    return std::numeric_limits<float>::infinity();
+}
+
+float Plane::getRadiusSqrt() const
+{
+    return std::numeric_limits<float>::infinity();
 }
 
 bool Plane::isColliding(Object &object) const
@@ -182,18 +214,16 @@ GLenum Polygon::loadModel(const std::string& path, const Eigen::Vector3f offSet,
     this->vertices = std::vector<float>{model.VBO_vertices(),
                                         model.VBO_vertices() + sizeof(GLfloat)*model.faces().size()*3*3};
 
-    this->indices = std::vector<unsigned int>(vertices.size());
-
     std::vector<Face> faces = model.faces();
-    for (unsigned int i = 0; i < faces.size(); ++i) {
-        this->indices[i*3+0] = i*3+0;
-        this->indices[i*3+1] = i*3+1;
-        this->indices[i*3+2] = i*3+2;
+    this->indices = std::vector<unsigned int>(faces.size()*3);
+
+    for (unsigned int i = 0; i < faces.size()*3; ++i) {
+        this->indices[i] = i;
     }
-    float maxX, maxY, maxZ, minY, minX, minZ;
-    maxX = minX = vertices[0];
-    maxY = minY = vertices[1];
-    maxZ = minZ = vertices[2];
+
+    maxX = minX = (vertices[0] + offSet.x()) / scale;
+    maxY = minY = (vertices[1] + offSet.y()) / scale;
+    maxZ = minZ = (vertices[2] + offSet.z()) / scale;
     for (unsigned int i = 0; i < vertices.size() / 3; ++i) {
         vertices[i*3+0] = (vertices[i*3+0] + offSet.x()) / scale;
         vertices[i*3+1] = (vertices[i*3+1] + offSet.y()) / scale;
@@ -207,17 +237,64 @@ GLenum Polygon::loadModel(const std::string& path, const Eigen::Vector3f offSet,
         if (vertices[i*3+1] < minY) {minY = vertices[i*3+1];}
         if (vertices[i*3+2] < minZ) {minZ = vertices[i*3+2];}
     }
+
+    r = (maxX - minX);
+    float Y = (maxY - minY);
+    float Z = (maxZ - minZ);
+    r = (r < Y)? Y : r;
+    r = (r < Z)? Z : r;
+    r2 = r*r;
+
     return GL_TRIANGLES;
 }
 
+
 float Polygon::getRadius() const
 {
-    return 1;
+    return r;
 }
 
-bool Polygon::isColliding(Object &) const
+float Polygon::getRadiusSqrt() const
 {
+    return r2;
+}
 
+inline bool polygonPoint(const Eigen::Vector3f& i, const Eigen::Vector3f& j, const Eigen::Vector3f& p)
+{
+    return (((i.y()>p.y()) != (j.y()>p.y())) &&
+            (p.x() < (j.x()-i.x()) * (p.y()-i.y()) / (j.y()-i.y()) + i.x()));
+}
+
+int Polygon::pointInPolygon(const Object& object) const {
+    bool oddNodes = true;
+    int first_col = -2;
+    for (unsigned int i = 0; i < indices.size() - 2; ++i) {
+        Eigen::Vector3f A(vertices[indices[i+0]], vertices[indices[i+0]+1], vertices[indices[i+0]+2]),
+                        B(vertices[indices[i+1]], vertices[indices[i+1]+1], vertices[indices[i+1]+2]),
+                        C(vertices[indices[i+2]], vertices[indices[i+2]+1], vertices[indices[i+2]+2]),
+                        n;
+        float d;
+        calculateNormal(A, B, C, n, d);
+        if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) &&
+            polygonPoint(A, B, p)) {
+            oddNodes = not oddNodes;
+            if(first_col == -2) {
+                first_col = i;
+            }
+        }
+    }
+
+    return oddNodes? first_col : -1;
+}
+
+bool Polygon::isColliding(Object& object) const
+{
     if (physicsType == PhysicsType::Transparent) return false;
+    if (sphereVsSphere(object.getPosition(), this->p, this->r2, object.getRadiusSqrt())) {
+        int face = pointInPolygon(object);
+        if (face > -1) {
+            return false;
+        }
+    }
     return false;
 }

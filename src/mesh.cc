@@ -24,6 +24,7 @@ Mesh::Mesh(const std::vector<float> vertices, const std::vector<unsigned int> in
     this->m = m;
     this->e = e;
     this->u = u;
+
     //predefined
     initSolver();
 }
@@ -35,8 +36,17 @@ void Mesh::render() const
 
 void Mesh::event(QEvent *) {}
 
-void Mesh::forceUpdate() {}
+void Mesh::forceUpdate()
+{
+    if (physicsType == PhysicsType::Normal) {
+        f = gravity*m;
+    }
+    else {
+        f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+    }
+}
 
 bool Mesh::collisionDetect(const std::list<Object*>&) {return false;}
 
 void Mesh::propagateCollision(const std::list<Object*>& ) {}
+

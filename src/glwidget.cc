@@ -64,7 +64,6 @@ void GLWidget::initializeGL()
     bool no_problems = Object::vanillaProgramsLoad();
     if (! no_problems) exit(0);
     loadScenary();
-    initialized = true;
 }
 
 void GLWidget::updateFPS()
@@ -105,6 +104,13 @@ void GLWidget::paintGL()
         //dt = 3;
         previousTime = currentTime;
 
+        for (Mesh* &o : objects.first) {
+            o->forceUpdate();
+        }
+        for (Particle* &o : objects.second) {
+            o->forceUpdate();
+        }
+
         //mesh
         std::list<Object*> aux(objects.first.begin(), objects.first.end());
         for (Mesh* &o : objects.first) {
@@ -112,9 +118,6 @@ void GLWidget::paintGL()
             o->render();
         }
         //particles
-        for (Particle* &o : objects.second) {
-            o->forceUpdate();
-        }
         for (Particle* &o : objects.second) {
             o->update(dt, aux);
             o->render();
@@ -196,6 +199,7 @@ void GLWidget::createParticle()
 void GLWidget::cleanScenary()
 {
     toCreate = 0;
+    initialized = false;
     for (QTimer* &t : lifeTimer) {
         delete t;
     }
@@ -210,7 +214,6 @@ void GLWidget::cleanScenary()
         delete p;
     }
     objects.second.clear();
-    initialized = false;
 }
 
 

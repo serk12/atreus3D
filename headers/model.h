@@ -75,6 +75,8 @@ class Model {
   float *VBO_matshin () {
     return _VBO_matshin;
   }
+  int getQttyVertices() const;
+  int getQttyFace() const;
 
  private:
   std::vector<Vertex> _vertices;

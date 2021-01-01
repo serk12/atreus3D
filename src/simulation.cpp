@@ -337,8 +337,24 @@ bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 }
 
 bool createRigidBody(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects) {
-    Polygon *p = new Polygon("../atreus3D/models/Patricio.obj", Eigen::Vector3f(9.5f,-6.0f,0.0f), 7.0f, Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1);
-    objects.first.push_back(p);
+    //Polygon *p = new Polygon("../atreus3D/models/Patricio.obj" , Eigen::Vector3f(9.5f,-6.0f,0.0f), 10.0f, Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1);
+    //objects.first.push_back(p);
+    std::vector<float> box;
+    std::vector<unsigned int> boxi;
+    float r = 0.45f;
+    box = {
+        0.0f*r, 0.5f*r, 0.0f*r,
+        1.0f*r, 0.0f*r, 0.0f*r,
+        0.0f*r, 0.0f*r, 1.0f*r,
+    };
+    boxi = {
+        0,1,2,
+        2,1,0,
+    };
+    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(0.0f, 0.12f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), 2.0f);
+    objects.first.push_back(t);
+    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 3, 0.95f, 0.50f, 0.18f);
+    objects.first.push_back(s);
     defaultBox(objects);
     return true;
 }
@@ -380,33 +396,31 @@ bool Simulation::loadSim(std::pair<std::list<Mesh*>, std::list<Particle*> >& obj
 
 void Simulation::addParticle(std::list<Particle*>& particleList)
 {
-    if (initiatedScen > 1) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dis(0, 1);
-        float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
-        Particle *b = nullptr;
-        switch (Simulation::scenaryType) {
-        case ScenaryType::RigidBody:
-        case ScenaryType::Cascade:
-            b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 0.0f, 2.0f*rz), m, e, u);
-            break;
-        case ScenaryType::Fountain:
-            b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
-            break;
-        case ScenaryType::Rain:
-            b = new Particle(Eigen::Vector3f((rx-0.5f)*0.2f, 0.85f, (rz-0.5f)*0.2f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
-            break;
-        case ScenaryType::Debug:
-            b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
-            break;
-        default:
-            break;
-        }
-        if (b != nullptr) {
-            b->load();
-            particleList.push_back(b);
-        }
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0, 1);
+    float rx = dis(gen)-0.5f, rz = dis(gen)-0.5f, ry = dis(gen)-0.5f;
+    Particle *b = nullptr;
+    switch (Simulation::scenaryType) {
+    case ScenaryType::Cascade:
+        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.3f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 0.0f, 2.0f*rz), m, e, u);
+        break;
+    case ScenaryType::Fountain:
+        b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
+        break;
+    case ScenaryType::RigidBody:
+    case ScenaryType::Rain:
+        b = new Particle(Eigen::Vector3f(rx*0.5f, 0.85f, rz*0.5f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
+        break;
+    case ScenaryType::Debug:
+        b = new Particle(Eigen::Vector3f(0.0f, 0.85f, 0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
+        break;
+    default:
+        break;
+    }
+    if (b != nullptr) {
+        b->load();
+        particleList.push_back(b);
     }
 }
 
@@ -434,7 +448,7 @@ std::string int2string(int value, int n = 3)
 
 void Simulation::on_TopParticles_valueChanged(int value)
 {
-    std::string text = "Birth Time: #" + std::to_string(value);
+    std::string text = "Max Particles: #" + std::to_string(value);
     ui->MaxParticleLab->setText(QString::fromUtf8(text.c_str()));
     Simulation::maxParticles = value;
 }
