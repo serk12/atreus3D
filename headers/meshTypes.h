@@ -9,10 +9,10 @@
 
 class Sphere : public Mesh {
 public:
-    Sphere();
     virtual ~Sphere() {}
-    Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
-    Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r);
+    Sphere();
+    Sphere(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float r);
+    Sphere(const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r);
 
     float getRadius() const final;
     float getRadiusSqrt() const final;

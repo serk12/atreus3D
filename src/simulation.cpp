@@ -155,7 +155,7 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
     Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(-0.75f, -0.50f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
     objects.first.push_back(t);
 
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
+    Sphere *s = new Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
     objects.first.push_back(s);
 
     return true;
@@ -235,7 +235,7 @@ bool stringScene(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
     defaultPlane(objects);
 
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),
+    Sphere *s = new Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f),
                            Eigen::Vector3f(0.0f,0.2f,0.1f),
                            Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.5f);
     objects.first.push_back(s);
@@ -325,8 +325,7 @@ bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 {
     defaultPlane(objects);
 
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere,
-                           Eigen::Vector3f(0.2f,0.5f,1.0f),
+    Sphere *s = new Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f),
                            Eigen::Vector3f(0.0f,0.25f,0.0f),
                            Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.30f);
     objects.first.push_back(s);
@@ -353,7 +352,7 @@ bool createRigidBody(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
     };
     Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(0.0f, 0.12f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), 2.0f);
     objects.first.push_back(t);
-    Sphere *s = new Sphere({0.0f, 0.0f, 0.0f}, {0}, Object::ShaderType::Sphere, Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 3, 0.95f, 0.50f, 0.18f);
+    Sphere *s = new Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 3, 0.95f, 0.50f, 0.18f);
     objects.first.push_back(s);
     defaultBox(objects);
     return true;

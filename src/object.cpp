@@ -122,7 +122,7 @@ bool Object::vanillaProgramsLoad()
     if (vanilla <= 0 || sphere <= 0) return false;
     Object::programsList.resize(QTTYSHADERS);
     Object::programsList[int(ShaderType::Vanilla)] = vanilla;
-    Object::programsList[int(ShaderType::Sphere)] = sphere;
+    Object::programsList[int(ShaderType::Ball)] = sphere;
     return true;
 }
 
@@ -151,7 +151,7 @@ void Object::renderType(int type) const
     glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, modelObject.data());
 
     switch (shaderType) {
-    case ShaderType::Sphere:
+    case ShaderType::Ball:
         glUniform1f(glGetUniformLocation(program, "rSphere"), getRadius());
         break;
     default:
@@ -240,6 +240,20 @@ void Object::correctObject(const Eigen::Vector3f& n, const float d, bool add)
     v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
     p = p - (1.0f + e) * (n.dot(p)+d_aux) * n;
     p_pass = p - (v * 0.016f);
+}
+
+bool Object::collisionDetect(const std::list<Object*>& meshs)
+{
+    bool result = false;
+    for (Object* m : meshs) {
+        if(m->isColliding(*this)) result = true;
+    }
+    return result;
+}
+
+Object::ObjectType Object::getType() const
+{
+    return _type;
 }
 
 float Object::getWeight() const

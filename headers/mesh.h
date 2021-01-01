@@ -18,7 +18,6 @@ public:
 private:
     GLenum type;
 
-    bool collisionDetect(const std::list<Object*>& meshs) final;
     void propagateCollision(const std::list<Object*>& meshs) final;
 };
 

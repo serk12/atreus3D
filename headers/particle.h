@@ -40,7 +40,7 @@ private:
     std::list<Particle*> links;
     std::list<float> linksDistance;
     float k_elas = GENERAL_K_ELAS, k_damp = GENERAL_K_DUMP;
-    bool collisionDetect(const std::list<Object*>& meshs) final;
+
     void propagateCollision(const std::list<Object*>& meshs) final;
 
 };

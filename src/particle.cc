@@ -4,13 +4,13 @@
 
 // https://imdoingitwrong.wordpress.com/tag/sph/
 
-Particle::Particle() : Particle(ShaderType::Sphere, Eigen::Vector3f(0.2f, 0.6f, 0.5f),
+Particle::Particle() : Particle(ShaderType::Ball, Eigen::Vector3f(0.2f, 0.6f, 0.5f),
                                 Eigen::Vector3f(0.0f, 0.0f, 0.0f),
                                 Eigen::Vector3f(0.0002f, 0.0f, 0.0f), 0.05f, 0.96f, 0.670f) {}
 
-Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u) {}
+Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u) : Particle(ShaderType::Ball, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u) {}
 
-Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const Eigen::Vector3f c) : Particle(ShaderType::Sphere, c, p, v, m, e, u) {}
+Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const Eigen::Vector3f c) : Particle(ShaderType::Ball, c, p, v, m, e, u) {}
 
 Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
 {
@@ -21,6 +21,7 @@ Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, c
     this->m = m;
     this->e = e;
     this->u = u;
+    this->_type = ObjectType::_Particle;
 
     //predefined
     vertices = {0.0f, 0.0f,  0.0f};
@@ -36,7 +37,7 @@ Particle::Particle(const ShaderType programIndex, const Eigen::Vector3f color, c
     this->linksDistance = std::list<float>(linksDistance);
 }
 Particle::Particle(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u,
-                   const std::list<Particle*> links, const std::list<float> linksDistance) : Particle(ShaderType::Sphere, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u)
+                   const std::list<Particle*> links, const std::list<float> linksDistance) : Particle(ShaderType::Ball, Eigen::Vector3f(0.6f, 0.2f, 0.5f), p, v, m, e, u)
 {
     this->links = std::list<Particle*>(links);
     this->linksDistance = std::list<float>(linksDistance);
@@ -90,15 +91,6 @@ void Particle::forceUpdate()
 bool Particle::isColliding(Object &) const
 {
     return false;
-}
-
-bool Particle::collisionDetect(const std::list<Object*>& meshs)
-{
-    bool result = false;
-    for (Object* m : meshs) {
-        if(m->isColliding(*this)) result = true;
-    }
-    return result;
 }
 
 void Particle::setDampingTerm(const float k_damp)

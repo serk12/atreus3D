@@ -46,7 +46,5 @@ void Mesh::forceUpdate()
     }
 }
 
-bool Mesh::collisionDetect(const std::list<Object*>&) {return false;}
-
 void Mesh::propagateCollision(const std::list<Object*>& ) {}
 

@@ -51,15 +51,18 @@ inline bool triangleCrossed(const Eigen::Vector3f& n, const float d, const float
 // SPHERE //
 // ****** //
 
-Sphere::Sphere() : Mesh() {}
-Sphere::Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.30f, GL_TRIANGLES) {}
+Sphere::Sphere()
+    : Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f), Eigen::Vector3f(0.0f,0.2f,0.1f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.5f) {}
 
-Sphere::Sphere(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r)
-    : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, GL_POINTS)
+Sphere::Sphere(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float r)
+    : Sphere(Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.30f, r) {}
+
+Sphere::Sphere(const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const float r)
+    : Mesh({0.0f, 0.0f, 0.0f}, {0}, ShaderType::Ball, color, p, v, m, e, u, GL_POINTS)
 {
     this->r = r;
     this->r2 = r*r;
+    this->_type = Object::ObjectType::_Sphere;
 }
 
 float Sphere::getRadius() const
@@ -96,24 +99,18 @@ bool Sphere::isColliding(Object &object) const
 // TRIANGLE //
 // ******** //
 
-Triangle::Triangle() : Mesh() {}
+Triangle::Triangle()
+    : Triangle({0.0f, 0.5f, 0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,1.0f,}, {0,1,2,2,1,0,}, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), Eigen::Vector3f(0.0f,0.2f,0.1f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95, 0.60f, GL_TRIANGLES) {}
 Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.60f, GL_TRIANGLES)
-{
-    this->A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
-    this->B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
-    this->C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
-
-    calculateNormal(A,B,C, n, d);
-    area = areaTrangle(A, B, C);
-}
+    : Triangle(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.60f, GL_TRIANGLES)
+{}
 
 Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
     : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type)
 {
-    this->A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
-    this->B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
-    this->C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
+    this->A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]);
+    this->B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]);
+    this->C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]);
 
     calculateNormal(A ,B, C, n, d);
     area = areaTrangle(A, B, C);
@@ -123,6 +120,7 @@ Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned
     r = (C - A).norm() > r? (C - A).norm() : r;
     r /= 2.0f;
     r2 = r*r;
+    this->_type = Object::ObjectType::_Triangle;
 }
 
 
@@ -138,8 +136,12 @@ float Triangle::getRadiusSqrt() const
 
 bool Triangle::isColliding(Object &object) const
 {
+    Eigen::Vector3f aux_A = A + this->p;
+    Eigen::Vector3f aux_B = B + this->p;
+    Eigen::Vector3f aux_C = C + this->p;
     if (physicsType == PhysicsType::Transparent) return false;
-    if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and (areaTrangle(object.getPosition(), B, C) + areaTrangle(A, object.getPosition(), C) + areaTrangle(A, B, object.getPosition()) - area <= 0.01f)) {
+    if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and
+                    (areaTrangle(object.getPosition(), aux_B, aux_C) + areaTrangle(aux_A, object.getPosition(), aux_C) + areaTrangle(aux_A, aux_B, object.getPosition()) - area <= 0.01f)) {
         object.correctObject(n, d, false);
         return true;
     }
@@ -151,18 +153,10 @@ bool Triangle::isColliding(Object &object) const
 // ***** //
 
 
-Plane::Plane() : Mesh() {}
+Plane::Plane()
+    : Plane({-1.0f, -1.0f, 1.0f,1.0f, -1.0f, 1.0f,1.0f, -1.0f, -1.0f,-1.0f, -1.0f, -1.0f,}, {0,1,2,3}, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), Eigen::Vector3f(0.0f,0.2f,0.1f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95, 0.50f, GL_TRIANGLES) {}
 Plane::Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.50f, GL_TRIANGLES)
-{
-    Eigen::Vector3f A = Eigen::Vector3f(vertices[indices[0]*3], vertices[indices[0]*3+1], vertices[indices[0]*3+2]) + p;
-    Eigen::Vector3f B = Eigen::Vector3f(vertices[indices[1]*3], vertices[indices[1]*3+1], vertices[indices[1]*3+2]) + p;
-    Eigen::Vector3f C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
-
-    calculateNormal(A, B, C, n, d);
-}
-
-
+    : Plane(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.50f, GL_TRIANGLES) {}
 Plane::Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type)
     : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, type)
 {
@@ -171,6 +165,7 @@ Plane::Plane(const std::vector<float> vertices, const std::vector<unsigned int> 
     Eigen::Vector3f C = Eigen::Vector3f(vertices[indices[2]*3], vertices[indices[2]*3+1], vertices[indices[2]*3+2]) + p;
 
     calculateNormal(A, B, C, n, d);
+    this->_type = Object::ObjectType::_Plane;
 }
 
 
@@ -245,6 +240,8 @@ GLenum Polygon::loadModel(const std::string& path, const Eigen::Vector3f offSet,
     r = (r < Z)? Z : r;
     r2 = r*r;
 
+    this->_type = ObjectType::_Polygon;
+
     return GL_TRIANGLES;
 }
 
@@ -287,7 +284,7 @@ int Polygon::pointInPolygon(const Object& object) const {
     return oddNodes? first_col : -1;
 }
 
-bool Polygon::isColliding(Object& object) const
+bool Polygon::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
     if (sphereVsSphere(object.getPosition(), this->p, this->r2, object.getRadiusSqrt())) {

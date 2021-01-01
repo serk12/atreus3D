@@ -4,6 +4,8 @@
 #include <eigen3/Eigen/Geometry>
 #include <QEvent>
 #include <list>
+#include <iostream>
+
 #include "camera.h"
 #include "utils.h"
 
@@ -12,9 +14,10 @@
 class Object {
 
 public:
+    enum ObjectType  {_Particle, _Polygon, _Plane, _Sphere, _Triangle};
     enum SolverType  {Euler, SemiEuler, Verlet, RungeKuta2};
     enum PhysicsType {Normal, Immovable, Transparent};
-    enum ShaderType  {Vanilla = 0, Sphere = 1};
+    enum ShaderType  {Vanilla = 0, Ball = 1};
 
     virtual ~Object();
     virtual void render() const = 0;
@@ -46,6 +49,7 @@ public:
     static void setSolverModel(const SolverType solverType);
     static void setGravityScale(const float scale);
     static void setKd(float kd);
+    ObjectType getType() const;
 
 protected:
     // openGL basic shaders and render vars
@@ -71,10 +75,12 @@ protected:
     PhysicsType physicsType = PhysicsType::Normal;
     ShaderType  shaderType;
 
-    virtual bool collisionDetect(const std::list<Object*>& objects) = 0;
+    bool collisionDetect(const std::list<Object*>& objects);
     virtual void propagateCollision(const std::list<Object*>& meshs) = 0;
     void solver(const float dt);
     void initSolver();
+
+    ObjectType _type;
 
 private:
     inline static Eigen::Vector3f lightColor = GENERAL_LIGHT;
