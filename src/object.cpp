@@ -218,9 +218,10 @@ void Object::initSolver()
     if (m == -1) physicsType = PhysicsType::Immovable;
     else if (m == -2) physicsType = PhysicsType::Transparent;
     w_i = (m < 0.0f)? 0.0f : 1.0f/m;
-    f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+    f = Eigen::Vector3f::Zero();
     p_pass = p - (v * 0.016f);
     v_pass = v;
+    w = Eigen::Vector3f::Zero();
 }
 
 void Object::update(const float deltatime, const std::list<Object*>& meshs)
@@ -249,6 +250,11 @@ bool Object::collisionDetect(const std::list<Object*>& meshs)
         if(m->isColliding(*this)) result = true;
     }
     return result;
+}
+
+unsigned int Object::getID() const
+{
+    return VAO;
 }
 
 Object::ObjectType Object::getType() const

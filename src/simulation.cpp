@@ -407,7 +407,7 @@ void Simulation::addParticle(std::list<Particle*>& particleList)
     case ScenaryType::Fountain:
         b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
         break;
-    case ScenaryType::RigidBody:
+    //case ScenaryType::RigidBody:
     case ScenaryType::Rain:
         b = new Particle(Eigen::Vector3f(rx*0.5f, 0.85f, rz*0.5f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
         break;

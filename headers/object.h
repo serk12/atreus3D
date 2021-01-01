@@ -50,6 +50,7 @@ public:
     static void setGravityScale(const float scale);
     static void setKd(float kd);
     ObjectType getType() const;
+    unsigned int getID() const;
 
 protected:
     // openGL basic shaders and render vars
@@ -69,7 +70,7 @@ protected:
     inline static float gravityScale = GENERAL_GRAVITY_SCALE;
     inline static Eigen::Vector3f gravity = gravityScale * GENERAL_GRAVITY;
 
-    Eigen::Vector3f p, p_pass, v, v_pass, f;
+    Eigen::Vector3f p, p_pass, v, v_pass, w, f;
     float w_i, m, e, u;
     inline static SolverType solverType;
     PhysicsType physicsType = PhysicsType::Normal;

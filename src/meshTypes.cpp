@@ -46,6 +46,41 @@ inline bool triangleCrossed(const Eigen::Vector3f& n, const float d, const float
     return planeCrossed(n, d, p, p_pass, r) and (areaTrangle(p, B, C) + areaTrangle(A, p, C) + areaTrangle(A, B, p) - area <= 0.01f);
 }
 
+bool triangleVsSphere(const Object& a, const Object& b) {return false;}
+bool planeVsPolygon(const Object& a, const Object& b) {return false;}
+bool planeVsSphere(const Object& a, const Object& b) {return false;}
+bool planeVsTriangle(const Object& a, const Object& b) {return false;}
+bool polygonVsSphere(const Object& a, const Object& b) {return false;}
+bool polygonVsTriangle(const Object& a, const Object& b) {return false;}
+bool planeVsPlane(const Object& a, const Object& b) {return false;}
+bool polygonVsPolygon(const Object& a, const Object& b) {return false;}
+bool triangleVsTriangle(const Object& a, const Object& b) {return false;}
+
+bool meshVsMesh(const Object& a, const Object& b) {
+    bool result = false;
+
+    if (a.getType() == b.getType()) {
+        if (a.getType() == Object::ObjectType::_Plane) {return planeVsPlane(a, b);}
+        else if (a.getType() == Object::ObjectType::_Polygon) {return polygonVsPolygon(a, b);}
+        else if (a.getType() == Object::ObjectType::_Sphere) {return sphereVsSphere(a.getPosition(), b.getPosition(), a.getRadiusSqrt(), b.getRadiusSqrt());}
+        else if (a.getType() == Object::ObjectType::_Triangle) {return triangleVsTriangle(a, b);}
+    }
+    else {
+        if ((a.getType() == Object::ObjectType::_Plane and b.getType() == Object::ObjectType::_Polygon) or
+            (b.getType() == Object::ObjectType::_Plane and a.getType() == Object::ObjectType::_Polygon)) { return planeVsPolygon(a, b); }
+        else if ((a.getType() == Object::ObjectType::_Plane and b.getType() == Object::ObjectType::_Sphere) or
+            (b.getType() == Object::ObjectType::_Plane and a.getType() == Object::ObjectType::_Sphere)) {return planeVsSphere(a, b);}
+        else if ((a.getType() == Object::ObjectType::_Plane and b.getType() == Object::ObjectType::_Triangle) or
+            (b.getType() == Object::ObjectType::_Plane and a.getType() == Object::ObjectType::_Triangle)) { return planeVsTriangle(a, b);}
+        else if ((a.getType() == Object::ObjectType::_Polygon and b.getType() == Object::ObjectType::_Sphere) or
+            (b.getType() == Object::ObjectType::_Polygon and a.getType() == Object::ObjectType::_Sphere)) { return polygonVsSphere(a, b);}
+        else if ((a.getType() == Object::ObjectType::_Polygon and b.getType() == Object::ObjectType::_Triangle) or
+            (b.getType() == Object::ObjectType::_Polygon and a.getType() == Object::ObjectType::_Triangle)) { return polygonVsTriangle(a, b);}
+        else if ((a.getType() == Object::ObjectType::_Sphere and b.getType() == Object::ObjectType::_Triangle) or
+            (b.getType() == Object::ObjectType::_Sphere and a.getType() == Object::ObjectType::_Triangle)) { return triangleVsSphere(a, b);}
+    }
+    return result;
+}
 
 // ****** //
 // SPHERE //
@@ -78,19 +113,24 @@ float Sphere::getRadiusSqrt() const
 bool Sphere::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
-    Eigen::Vector3f p = object.getPosition();
-    if (sphereVsSphere(p, this->p, this->r2, object.getRadiusSqrt())) {
-        Eigen::Vector3f c = this->p;
-        Eigen::Vector3f v = object.getVelocity();
-        float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
-        float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
-        float dir1 = (-beta+aux_1)/(aux_2);
-        float dir2 = (-beta-aux_1)/(aux_2);
-        if (std::isnan(dir1) && std::isnan(dir2)) return false;
-        Eigen::Vector3f P = object.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
-        Eigen::Vector3f n = (P - c).normalized();
-        float d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
-        object.correctObject(n, d, true);
+    if (object.getType() == ObjectType::_Particle) {
+        Eigen::Vector3f p = object.getPosition();
+        if (sphereVsSphere(p, this->p, this->r2, object.getRadiusSqrt())) {
+            Eigen::Vector3f c = this->p;
+            Eigen::Vector3f v = object.getVelocity();
+            float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
+            float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
+            float dir1 = (-beta+aux_1)/(aux_2);
+            float dir2 = (-beta-aux_1)/(aux_2);
+            if (std::isnan(dir1) && std::isnan(dir2)) return false;
+            Eigen::Vector3f P = object.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
+            Eigen::Vector3f n = (P - c).normalized();
+            float d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
+            object.correctObject(n, d, true);
+        }
+    }
+    else if (object.getID() < this->getID()){
+        return meshVsMesh(*this, object);
     }
     return false;
 }
@@ -136,14 +176,20 @@ float Triangle::getRadiusSqrt() const
 
 bool Triangle::isColliding(Object &object) const
 {
-    Eigen::Vector3f aux_A = A + this->p;
-    Eigen::Vector3f aux_B = B + this->p;
-    Eigen::Vector3f aux_C = C + this->p;
     if (physicsType == PhysicsType::Transparent) return false;
-    if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and
-                    (areaTrangle(object.getPosition(), aux_B, aux_C) + areaTrangle(aux_A, object.getPosition(), aux_C) + areaTrangle(aux_A, aux_B, object.getPosition()) - area <= 0.01f)) {
-        object.correctObject(n, d, false);
-        return true;
+    if (object.getType() == ObjectType::_Particle) {
+        Eigen::Vector3f aux_A = A + this->p;
+        Eigen::Vector3f aux_B = B + this->p;
+        Eigen::Vector3f aux_C = C + this->p;
+        if (physicsType == PhysicsType::Transparent) return false;
+        if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and
+                        (areaTrangle(object.getPosition(), aux_B, aux_C) + areaTrangle(aux_A, object.getPosition(), aux_C) + areaTrangle(aux_A, aux_B, object.getPosition()) - area <= 0.01f)) {
+            object.correctObject(n, d, false);
+            return true;
+        }
+    }
+    else if (object.getID() < this->getID()){
+        return meshVsMesh(*this, object);
     }
     return false;
 }
@@ -182,9 +228,14 @@ float Plane::getRadiusSqrt() const
 bool Plane::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
-    if(planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius())) {
-        object.correctObject(n, d, false);
-        return true;
+    if (object.getType() == ObjectType::_Particle) {
+        if(planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius())) {
+            object.correctObject(n, d, false);
+            return true;
+        }
+    }
+    else if (object.getID() < this->getID()){
+        return meshVsMesh(*this, object);
     }
     return false;
 }
@@ -196,11 +247,10 @@ bool Plane::isColliding(Object &object) const
 Polygon::Polygon() : Mesh() {}
 
 Polygon::Polygon(const std::string& path, const Eigen::Vector3f offSet, const float scale, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m)
-    : Mesh(vertices, indices, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f, loadModel(path, offSet, scale)) {
-}
+    : Polygon(path, offSet, scale, ShaderType::Vanilla, Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95f, 0.250f) {}
 
 Polygon::Polygon(const std::string& path, const Eigen::Vector3f offSet, const float scale, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
-    : Mesh(vertices, indices, programIndice, color, p, v, m, e, u, loadModel(path, offSet, scale)) {
+    : Mesh({}, {}, programIndice, color, p, v, m, e, u, loadModel(path, offSet, scale)) {
 }
 
 GLenum Polygon::loadModel(const std::string& path, const Eigen::Vector3f offSet, const float scale)
@@ -287,11 +337,16 @@ int Polygon::pointInPolygon(const Object& object) const {
 bool Polygon::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
-    if (sphereVsSphere(object.getPosition(), this->p, this->r2, object.getRadiusSqrt())) {
-        int face = pointInPolygon(object);
-        if (face > -1) {
-            return false;
+    if (object.getType() == ObjectType::_Particle) {
+        if (sphereVsSphere(object.getPosition(), this->p, this->r2, object.getRadiusSqrt())) {
+            int face = pointInPolygon(object);
+            if (face > -1) {
+                return false;
+            }
         }
+    }
+    else if (object.getID() < this->getID()){
+        return meshVsMesh(*this, object);
     }
     return false;
 }
