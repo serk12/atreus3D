@@ -146,6 +146,9 @@ void Object::renderType(int type) const
 
     Eigen::Affine3f translation;
     translation.matrix() = Object::model;
+    if (shaderType != ShaderType::Ball) {
+        translation.linear() = q.toRotationMatrix();
+    }
     translation.translation() = p;
     Eigen::Matrix4f modelObject = translation.matrix();
     glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, modelObject.data());
@@ -189,14 +192,25 @@ void Object::solver(const float dtMs)
 
     Eigen::Vector3f aux_p = p;
     Eigen::Vector3f aux_v = v;
+    Eigen::Vector3f w;
+    Eigen::Quaternionf aux;
     switch(solverType) {
     case SolverType::Euler:
         p = p + dt*v;
         v = v + dt*(w_i*f);
         break;
     case SolverType::SemiEuler:
-        v = v + dt*(w_i*f);
+        P = P + dt*f;
+        L = L + dt*tor;
+        v = v + P*w_i;
         p = p + dt*v;
+        I_inv = q.toRotationMatrix() * I_body * q.toRotationMatrix();
+        aux.w() = 0;
+        w = (I_inv * L).normalized();
+        q.normalize();
+        aux.w() = 0.0f * q.w() - w.dot(q.vec());
+        aux.vec() = 0.0f * q.vec() + q.w() * w + w.cross(q.vec());
+        q = aux;
         break;
     case SolverType::Verlet:
         p = p + k_d*(p-p_pass)+dt*(dt*(f*w_i));
@@ -218,10 +232,12 @@ void Object::initSolver()
     if (m == -1) physicsType = PhysicsType::Immovable;
     else if (m == -2) physicsType = PhysicsType::Transparent;
     w_i = (m < 0.0f)? 0.0f : 1.0f/m;
-    f = Eigen::Vector3f::Zero();
     p_pass = p - (v * 0.016f);
     v_pass = v;
-    w = Eigen::Vector3f::Zero();
+    P = L = tor = f = Eigen::Vector3f::Zero();
+    q = Eigen::Quaternionf::Identity();
+    I_body = m * Eigen::Matrix3f::Identity(); //To Do set mass
+    I_inv = q.toRotationMatrix() * I_body * q.toRotationMatrix();
 }
 
 void Object::update(const float deltatime, const std::list<Object*>& meshs)

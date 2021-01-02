@@ -84,8 +84,10 @@ void Particle::forceUpdate()
         }
     }
     else {
-        f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+        f = Eigen::Vector3f::Zero();
     }
+
+    tor = Eigen::Vector3f::Zero();
 }
 
 bool Particle::isColliding(Object &) const
@@ -116,11 +118,4 @@ void Particle::setDistancyTerm(const float d)
     }
 }
 
-void Particle::propagateCollision(const std::list<Object*>&)
-{
-//    for (std::list<Particle*>::iterator it = links.begin(); it != links.end(); ++it) {
-//        // first do the correction then check if errors
-//        bool result = (*it)->collisionDetect(meshs);
-//        if (result) (*it)->propagateCollision(meshs);
-//    }
-}
+void Particle::propagateCollision(const std::list<Object*>&) {}

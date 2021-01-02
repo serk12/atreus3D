@@ -70,7 +70,9 @@ protected:
     inline static float gravityScale = GENERAL_GRAVITY_SCALE;
     inline static Eigen::Vector3f gravity = gravityScale * GENERAL_GRAVITY;
 
-    Eigen::Vector3f p, p_pass, v, v_pass, w, f;
+    Eigen::Vector3f p, p_pass, v, v_pass, P, L, tor, f;
+    Eigen::Matrix3f I_inv, I_body;
+    Eigen::Quaternionf q;
     float w_i, m, e, u;
     inline static SolverType solverType;
     PhysicsType physicsType = PhysicsType::Normal;

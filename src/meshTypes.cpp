@@ -87,7 +87,7 @@ bool meshVsMesh(const Object& a, const Object& b) {
 // ****** //
 
 Sphere::Sphere()
-    : Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f), Eigen::Vector3f(0.0f,0.2f,0.1f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.5f) {}
+    : Sphere(Eigen::Vector3f(0.5f, 1.0f, 0.5f), Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), -1, 0.95f, 0.80f, 0.5f) {}
 
 Sphere::Sphere(const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float r)
     : Sphere(Eigen::Vector3f(0.5f, 1.0f, 0.5f), p, v, m, 0.95, 0.30f, r) {}
@@ -113,7 +113,8 @@ float Sphere::getRadiusSqrt() const
 bool Sphere::isColliding(Object &object) const
 {
     if (physicsType == PhysicsType::Transparent) return false;
-    if (object.getType() == ObjectType::_Particle) {
+    if (object.getType() == ObjectType::_Particle or
+       (object.getType() == ObjectType::_Sphere and object.getID() < this->getID())) {
         Eigen::Vector3f p = object.getPosition();
         if (sphereVsSphere(p, this->p, this->r2, object.getRadiusSqrt())) {
             Eigen::Vector3f c = this->p;

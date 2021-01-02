@@ -42,8 +42,10 @@ void Mesh::forceUpdate()
         f = gravity*m;
     }
     else {
-        f = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+        f = Eigen::Vector3f::Zero();
+
     }
+    tor += Eigen::Vector3f::Zero();
 }
 
 void Mesh::propagateCollision(const std::list<Object*>& ) {}
