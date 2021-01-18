@@ -26,7 +26,6 @@ inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::V
     return (n.dot(p) + d_aux) * (n.dot(p_pass) + d_aux) <= 0.0f;
 }
 
-
 inline bool sphereVsSphere(Eigen::Vector3f p1, Eigen::Vector3f p2, float rs1, float rs2)
 {
     Eigen::Vector3f diff_p = p1 - p2;
@@ -46,40 +45,50 @@ inline bool triangleCrossed(const Eigen::Vector3f& n, const float d, const float
     return planeCrossed(n, d, p, p_pass, r) and (areaTrangle(p, B, C) + areaTrangle(A, p, C) + areaTrangle(A, B, p) - area <= 0.01f);
 }
 
-bool triangleVsSphere(const Object& a, const Object& b) {return false;}
-bool planeVsPolygon(const Object& a, const Object& b) {return false;}
-bool planeVsSphere(const Object& a, const Object& b) {return false;}
-bool planeVsTriangle(const Object& a, const Object& b) {return false;}
-bool polygonVsSphere(const Object& a, const Object& b) {return false;}
-bool polygonVsTriangle(const Object& a, const Object& b) {return false;}
-bool planeVsPlane(const Object& a, const Object& b) {return false;}
-bool polygonVsPolygon(const Object& a, const Object& b) {return false;}
-bool triangleVsTriangle(const Object& a, const Object& b) {return false;}
-
-bool meshVsMesh(const Object& a, const Object& b) {
-    bool result = false;
-
-    if (a.getType() == b.getType()) {
-        if (a.getType() == Object::ObjectType::_Plane) {return planeVsPlane(a, b);}
-        else if (a.getType() == Object::ObjectType::_Polygon) {return polygonVsPolygon(a, b);}
-        else if (a.getType() == Object::ObjectType::_Sphere) {return sphereVsSphere(a.getPosition(), b.getPosition(), a.getRadiusSqrt(), b.getRadiusSqrt());}
-        else if (a.getType() == Object::ObjectType::_Triangle) {return triangleVsTriangle(a, b);}
+bool resolveSphereVsSphere(Object& a, Object& b)
+{
+    Eigen::Vector3f p = b.getPosition();
+    if (sphereVsSphere(p, a.getPosition(), a.getRadiusSqrt(), b.getRadiusSqrt())) {
+        Eigen::Vector3f c = a.getPosition();
+        Eigen::Vector3f v = b.getVelocity();
+        float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - a.getRadiusSqrt();
+        float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
+        float dir1 = (-beta+aux_1)/(aux_2);
+        float dir2 = (-beta-aux_1)/(aux_2);
+        if (std::isnan(dir1) && std::isnan(dir2)) return false;
+        Eigen::Vector3f P = b.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
+        Eigen::Vector3f n = (P - c).normalized();
+        float d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
+        b.correctObject(n, d, Object::POSITIVE_FORCE, Object::POSITIVE_FORCE);
+        a.correctObject(n, d, Object::POSITIVE_FORCE, Object::NEGATIVE_FORCE);
     }
-    else {
-        if ((a.getType() == Object::ObjectType::_Plane and b.getType() == Object::ObjectType::_Polygon) or
-            (b.getType() == Object::ObjectType::_Plane and a.getType() == Object::ObjectType::_Polygon)) { return planeVsPolygon(a, b); }
-        else if ((a.getType() == Object::ObjectType::_Plane and b.getType() == Object::ObjectType::_Sphere) or
-            (b.getType() == Object::ObjectType::_Plane and a.getType() == Object::ObjectType::_Sphere)) {return planeVsSphere(a, b);}
-        else if ((a.getType() == Object::ObjectType::_Plane and b.getType() == Object::ObjectType::_Triangle) or
-            (b.getType() == Object::ObjectType::_Plane and a.getType() == Object::ObjectType::_Triangle)) { return planeVsTriangle(a, b);}
-        else if ((a.getType() == Object::ObjectType::_Polygon and b.getType() == Object::ObjectType::_Sphere) or
-            (b.getType() == Object::ObjectType::_Polygon and a.getType() == Object::ObjectType::_Sphere)) { return polygonVsSphere(a, b);}
-        else if ((a.getType() == Object::ObjectType::_Polygon and b.getType() == Object::ObjectType::_Triangle) or
-            (b.getType() == Object::ObjectType::_Polygon and a.getType() == Object::ObjectType::_Triangle)) { return polygonVsTriangle(a, b);}
-        else if ((a.getType() == Object::ObjectType::_Sphere and b.getType() == Object::ObjectType::_Triangle) or
-            (b.getType() == Object::ObjectType::_Sphere and a.getType() == Object::ObjectType::_Triangle)) { return triangleVsSphere(a, b);}
+    return false;
+}
+
+bool resolveTriangleVsSphere(Triangle& a, Object& b)
+{
+    Eigen::Vector3f aux_A = a.getVertex(0) + a.getPosition();
+    Eigen::Vector3f aux_B = a.getVertex(1) + a.getPosition();
+    Eigen::Vector3f aux_C = a.getVertex(2) + a.getPosition();
+    if (planeCrossed(a.getN(), a.getD(), b.getPosition(), b.getPassPosition(), b.getRadius()) and
+                    (areaTrangle(b.getPosition(), aux_B, aux_C) + areaTrangle(aux_A, b.getPosition(), aux_C) + areaTrangle(aux_A, aux_B, b.getPosition()) - a.getArea() <= 0.01f)) {
+        b.correctObject(a.getN(), a.getD(), Object::NEGATIVE_OFFSET, Object::POSITIVE_FORCE);
+        a.correctObject(a.getN(), a.getD(), Object::NEGATIVE_OFFSET, Object::NEGATIVE_FORCE);
+        return true;
     }
-    return result;
+    return false;
+}
+
+bool resolvePlaneVsSphere(Plane& a, Object& b)
+{
+    Eigen::Vector3f n = a.getN();
+    float d = a.getD();
+    if(planeCrossed(n, d, b.getPosition(), b.getPassPosition(), b.getRadius())) {
+        b.correctObject(n, d, Object::NEGATIVE_OFFSET, Object::POSITIVE_FORCE);
+        a.correctObject(n, d, Object::NEGATIVE_OFFSET, Object::NEGATIVE_FORCE);
+        return true;
+    }
+    return false;
 }
 
 // ****** //
@@ -98,6 +107,8 @@ Sphere::Sphere(const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen
     this->r = r;
     this->r2 = r*r;
     this->_type = Object::ObjectType::_Sphere;
+    //predefined
+    initSolver();
 }
 
 float Sphere::getRadius() const
@@ -110,30 +121,34 @@ float Sphere::getRadiusSqrt() const
     return this->r2;
 }
 
-bool Sphere::isColliding(Object &object) const
+
+bool Sphere::isColliding(Object &object)
 {
     if (physicsType == PhysicsType::Transparent) return false;
     if (object.getType() == ObjectType::_Particle or
        (object.getType() == ObjectType::_Sphere and object.getID() < this->getID())) {
-        Eigen::Vector3f p = object.getPosition();
-        if (sphereVsSphere(p, this->p, this->r2, object.getRadiusSqrt())) {
-            Eigen::Vector3f c = this->p;
-            Eigen::Vector3f v = object.getVelocity();
-            float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - r2;
-            float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
-            float dir1 = (-beta+aux_1)/(aux_2);
-            float dir2 = (-beta-aux_1)/(aux_2);
-            if (std::isnan(dir1) && std::isnan(dir2)) return false;
-            Eigen::Vector3f P = object.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
-            Eigen::Vector3f n = (P - c).normalized();
-            float d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
-            object.correctObject(n, d, true);
-        }
+        return resolveSphereVsSphere((*this), object);
     }
     else if (object.getID() < this->getID()){
-        return meshVsMesh(*this, object);
+        switch (object.getType()) {
+        case ObjectType::_Plane:
+                break;
+        case ObjectType::_Polygon:
+                break;
+        case ObjectType::_Triangle:
+                break;
+        default:
+            std::cout << "collision problem" << std::endl;
+        break;
+        }
     }
     return false;
+}
+
+
+Eigen::Matrix3f Sphere::getInertiaMatrix() const
+{
+    return Eigen::Matrix3f::Identity() * (1.0f/5.0f* r2 + r2);
 }
 
 // ******** //
@@ -161,7 +176,9 @@ Triangle::Triangle(const std::vector<float> vertices, const std::vector<unsigned
     r = (C - A).norm() > r? (C - A).norm() : r;
     r /= 2.0f;
     r2 = r*r;
-    this->_type = Object::ObjectType::_Triangle;
+    this->_type = Object::ObjectType::_Triangle;    
+    //predefined
+    initSolver();
 }
 
 
@@ -175,25 +192,53 @@ float Triangle::getRadiusSqrt() const
     return r2;
 }
 
-bool Triangle::isColliding(Object &object) const
+Eigen::Vector3f Triangle::getVertex(int id) const
+{
+    if (id%3 == 0) return A;
+    if (id%3 == 1) return B;
+    if (id%3 == 2) return C;
+    return Eigen::Vector3f::Zero();
+}
+
+float Triangle::getD() const {return d;}
+float Triangle::getArea() const {return area;}
+Eigen::Vector3f Triangle::getN() const {return n;}
+
+bool Triangle::isColliding(Object &object)
 {
     if (physicsType == PhysicsType::Transparent) return false;
-    if (object.getType() == ObjectType::_Particle) {
-        Eigen::Vector3f aux_A = A + this->p;
-        Eigen::Vector3f aux_B = B + this->p;
-        Eigen::Vector3f aux_C = C + this->p;
-        if (physicsType == PhysicsType::Transparent) return false;
-        if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) and
-                        (areaTrangle(object.getPosition(), aux_B, aux_C) + areaTrangle(aux_A, object.getPosition(), aux_C) + areaTrangle(aux_A, aux_B, object.getPosition()) - area <= 0.01f)) {
-            object.correctObject(n, d, false);
-            return true;
-        }
+    if (object.getType() == ObjectType::_Particle or object.getType() == ObjectType::_Sphere) {
+        return resolveTriangleVsSphere(*this, object);
     }
     else if (object.getID() < this->getID()){
-        return meshVsMesh(*this, object);
+        switch (object.getType()) {
+        case ObjectType::_Plane:
+                break;
+        case ObjectType::_Polygon:
+                break;
+        case ObjectType::_Triangle:
+                break;
+        default:
+            std::cout << "collision problem" << std::endl;
+        break;
+        }
     }
     return false;
 }
+
+
+Eigen::Matrix3f Triangle::getInertiaMatrix() const
+{
+    float a = (getVertex(0) - getVertex(1)).norm();
+    float b = 2 * getArea() / a;
+    float c2 = 0.0001f;
+    Eigen::Matrix3f result = Eigen::Matrix3f::Identity();
+    result(0,0) *= (b*b + c2);
+    result(1,1) *= (a*a + c2);
+    result(2,2) *= (a*a + b*b);
+    return result;
+}
+
 
 // ***** //
 // PLANE //
@@ -213,6 +258,8 @@ Plane::Plane(const std::vector<float> vertices, const std::vector<unsigned int> 
 
     calculateNormal(A, B, C, n, d);
     this->_type = Object::ObjectType::_Plane;
+    //predefined
+    initSolver();
 }
 
 
@@ -226,19 +273,35 @@ float Plane::getRadiusSqrt() const
     return std::numeric_limits<float>::infinity();
 }
 
-bool Plane::isColliding(Object &object) const
+float Plane::getD() const {return d;}
+Eigen::Vector3f Plane::getN() const {return n;}
+
+bool Plane::isColliding(Object &object)
 {
     if (physicsType == PhysicsType::Transparent) return false;
-    if (object.getType() == ObjectType::_Particle) {
-        if(planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius())) {
-            object.correctObject(n, d, false);
-            return true;
-        }
+    if (object.getType() == ObjectType::_Particle or object.getType() == ObjectType::_Sphere) {
+        return resolvePlaneVsSphere(*this, object);
     }
     else if (object.getID() < this->getID()){
-        return meshVsMesh(*this, object);
+        switch (object.getType()) {
+        case ObjectType::_Plane:
+                break;
+        case ObjectType::_Polygon:
+                break;
+        case ObjectType::_Triangle:
+                break;
+        default:
+            std::cout << "collision problem" << std::endl;
+        break;
+        }
     }
     return false;
+}
+
+Eigen::Matrix3f Plane::getInertiaMatrix() const
+{
+    // technically this is infinite....
+    return Eigen::Matrix3f::Identity() * (1000.0f);
 }
 
 // ******* //
@@ -252,6 +315,8 @@ Polygon::Polygon(const std::string& path, const Eigen::Vector3f offSet, const fl
 
 Polygon::Polygon(const std::string& path, const Eigen::Vector3f offSet, const float scale, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u)
     : Mesh({}, {}, programIndice, color, p, v, m, e, u, loadModel(path, offSet, scale)) {
+    //predefined
+    initSolver();
 }
 
 GLenum Polygon::loadModel(const std::string& path, const Eigen::Vector3f offSet, const float scale)
@@ -335,7 +400,7 @@ int Polygon::pointInPolygon(const Object& object) const {
     return oddNodes? first_col : -1;
 }
 
-bool Polygon::isColliding(Object &object) const
+bool Polygon::isColliding(Object &object)
 {
     if (physicsType == PhysicsType::Transparent) return false;
     if (object.getType() == ObjectType::_Particle) {
@@ -347,7 +412,13 @@ bool Polygon::isColliding(Object &object) const
         }
     }
     else if (object.getID() < this->getID()){
-        return meshVsMesh(*this, object);
+        return false;
     }
     return false;
+}
+
+
+Eigen::Matrix3f Polygon::getInertiaMatrix() const
+{
+    return Eigen::Matrix3f::Identity() * (1.0f/3.0f* r2 + r2);
 }

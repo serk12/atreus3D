@@ -58,7 +58,12 @@ float Particle::getRadius() const
 
 float Particle::getRadiusSqrt() const
 {
-    return r;
+    return r2;
+}
+
+Eigen::Matrix3f Particle::getInertiaMatrix() const
+{
+    return Eigen::Matrix3f::Identity() * (1.0f/5.0f* r2 * r2);
 }
 
 void Particle::render() const
@@ -90,7 +95,7 @@ void Particle::forceUpdate()
     tor = Eigen::Vector3f::Zero();
 }
 
-bool Particle::isColliding(Object &) const
+bool Particle::isColliding(Object &)
 {
     return false;
 }

@@ -22,10 +22,11 @@ public:
 
     void render() const final;
     void event(QEvent *event) final;
-    bool isColliding(Object& object) const final;
+    bool isColliding(Object& object);
     float getRadius() const final;
     float getRadiusSqrt() const final;
-    void forceUpdate() final;
+    void forceUpdate() final;    
+    Eigen::Matrix3f getInertiaMatrix() const final;
 
     void addParticle(Particle* &p, const float distance);
     void setElasticityTerm(const float k_elas);

@@ -24,9 +24,6 @@ Mesh::Mesh(const std::vector<float> vertices, const std::vector<unsigned int> in
     this->m = m;
     this->e = e;
     this->u = u;
-
-    //predefined
-    initSolver();
 }
 
 void Mesh::render() const

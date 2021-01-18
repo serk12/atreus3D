@@ -146,10 +146,8 @@ void Object::renderType(int type) const
 
     Eigen::Affine3f translation;
     translation.matrix() = Object::model;
-    if (shaderType != ShaderType::Ball) {
-        translation.linear() = q.toRotationMatrix();
-    }
     translation.translation() = p;
+    translation.linear() = q.toRotationMatrix();
     Eigen::Matrix4f modelObject = translation.matrix();
     glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, modelObject.data());
 
@@ -194,35 +192,37 @@ void Object::solver(const float dtMs)
     Eigen::Vector3f aux_v = v;
     Eigen::Vector3f w;
     Eigen::Quaternionf aux;
+
+    P = P + dt*f;
+    L = L + dt*tor;
     switch(solverType) {
     case SolverType::Euler:
         p = p + dt*v;
-        v = v + dt*(w_i*f);
+        v = v + P*w_i;
         break;
     case SolverType::SemiEuler:
-        P = P + dt*f;
-        L = L + dt*tor;
         v = v + P*w_i;
         p = p + dt*v;
-        I_inv = q.toRotationMatrix() * I_body * q.toRotationMatrix();
-        aux.w() = 0;
-        w = (I_inv * L).normalized();
-        q.normalize();
-        aux.w() = 0.0f * q.w() - w.dot(q.vec());
-        aux.vec() = 0.0f * q.vec() + q.w() * w + w.cross(q.vec());
-        q = aux;
         break;
     case SolverType::Verlet:
         p = p + k_d*(p-p_pass)+dt*(dt*(f*w_i));
         v = (p - aux_p)/dt;
         break;
-    case SolverType::RungeKuta2: //semiEuler for the moment
-        v = v + dt*(w_i*f);
-        p = p + dt*(v+v)/2.0f;
+    case SolverType::RungeKuta2:
+        v = v + P*w_i;
+        p = p + dt*v;
         break;
     default:
         break;
     }
+
+    I_inv = q.toRotationMatrix() * I_body * q.toRotationMatrix();
+    aux.w() = 0;
+    w = (I_inv * L).normalized();
+    q.normalize();
+    aux.w() = 0.0f * q.w() - w.dot(q.vec());
+    aux.vec() = 0.0f * q.vec() + q.w() * w + w.cross(q.vec());
+    q = aux;
     v_pass = aux_v;
     p_pass = aux_p;
 }
@@ -236,8 +236,8 @@ void Object::initSolver()
     v_pass = v;
     P = L = tor = f = Eigen::Vector3f::Zero();
     q = Eigen::Quaternionf::Identity();
-    I_body = m * Eigen::Matrix3f::Identity(); //To Do set mass
-    I_inv = q.toRotationMatrix() * I_body * q.toRotationMatrix();
+    I_body = (m * getInertiaMatrix()).inverse();
+    I_inv = q.toRotationMatrix() * I_body * q.toRotationMatrix().transpose();
 }
 
 void Object::update(const float deltatime, const std::list<Object*>& meshs)
@@ -249,14 +249,17 @@ void Object::update(const float deltatime, const std::list<Object*>& meshs)
     }
 }
 
-void Object::correctObject(const Eigen::Vector3f& n, const float d, bool add)
+void Object::correctObject(const Eigen::Vector3f& n, const float d, bool offset, bool sign)
 {
-    float d_aux = (this->getRadius()*n).norm();
-    d_aux = d + (add? d_aux : -d_aux);
-    Eigen::Vector3f vt = v - ((n.dot(v)) * n);
-    v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
-    p = p - (1.0f + e) * (n.dot(p)+d_aux) * n;
-    p_pass = p - (v * 0.016f);
+    if (this->physicsType == PhysicsType::Normal) {
+        float d_aux = (this->getRadius()*n).norm();
+        d_aux = d + (offset? d_aux : -d_aux);
+        Eigen::Vector3f vt = v - ((n.dot(v)) * n);
+        if (!sign) vt *= -1.0f;
+        v = (v - (1.0f + e) * (n.dot(v)) * n) - (u * vt);
+        p = p - (1.0f + e) * (n.dot(p)+d_aux) * n;
+        p_pass = p - (v * 0.016f);
+    }
 }
 
 bool Object::collisionDetect(const std::list<Object*>& meshs)
@@ -334,3 +337,10 @@ void Object::setKd(float kd)
     Object::k_d = kd;
 }
 
+Eigen::Matrix3f Object::getInertiaMatrix() const
+{
+    std::cout << "Type: " << getType() << std::endl;
+    std::cout << getID() << std::endl;
+    std::cout << "this should not happen" << std::endl;
+    return Eigen::Matrix3f::Identity() * (1.0f/5.0f * (GENERAL_RM * GENERAL_RM) + (GENERAL_RM * GENERAL_RM));
+}

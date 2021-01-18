@@ -16,7 +16,8 @@ public:
 
     float getRadius() const final;
     float getRadiusSqrt() const final;
-    bool isColliding(Object& object) const final;
+    bool isColliding(Object& object) final;
+    Eigen::Matrix3f getInertiaMatrix() const final;
 
 private:
     float r = GENERAL_RM;
@@ -33,8 +34,12 @@ public:
 
     float getRadius() const final;
     float getRadiusSqrt() const final;
-    bool isColliding(Object& object) const final;
-
+    bool isColliding(Object& object) final;
+    Eigen::Matrix3f getInertiaMatrix() const final;
+    Eigen::Vector3f getVertex(int id) const;
+    float getD() const;
+    float getArea() const;
+    Eigen::Vector3f getN() const;
     float r;
     float r2;
 
@@ -51,10 +56,13 @@ public:
     virtual ~Plane() {}
     Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m);
     Plane(const std::vector<float> vertices, const std::vector<unsigned int> indices, const ShaderType programIndice, const Eigen::Vector3f color, const Eigen::Vector3f p, const Eigen::Vector3f v, const float m, const float e, const float u, const GLenum type);
+    float getD() const;
+    Eigen::Vector3f getN() const;
 
     float getRadius() const final;
     float getRadiusSqrt() const final;
-    bool isColliding(Object& object) const final;
+    bool isColliding(Object& object) final;
+    Eigen::Matrix3f getInertiaMatrix() const final;
 
 private:
     Eigen::Vector3f n;
@@ -71,7 +79,8 @@ public:
 
     float getRadius() const final;
     float getRadiusSqrt() const final;
-    bool isColliding(Object& object) const final;
+    Eigen::Matrix3f getInertiaMatrix() const final;
+    bool isColliding(Object& object) final;
     GLenum loadModel(const std::string& path, const Eigen::Vector3f offSet, const float scale);
     int pointInPolygon(const Object &object) const;
     Model model;

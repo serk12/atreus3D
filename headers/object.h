@@ -14,6 +14,10 @@
 class Object {
 
 public:
+    inline static bool const POSITIVE_OFFSET = true;
+    inline static bool const NEGATIVE_OFFSET = false;
+    inline static bool const POSITIVE_FORCE = true;
+    inline static bool const NEGATIVE_FORCE = false;
     enum ObjectType  {_Particle, _Polygon, _Plane, _Sphere, _Triangle};
     enum SolverType  {Euler, SemiEuler, Verlet, RungeKuta2};
     enum PhysicsType {Normal, Immovable, Transparent};
@@ -31,12 +35,14 @@ public:
     static void deleteVanillas();
 
     void load();
-    virtual bool isColliding(Object& object) const = 0;
+    virtual bool isColliding(Object& object) = 0;
 
-    void correctObject(const Eigen::Vector3f& n, const float d, bool add);
+    void correctObject(const Eigen::Vector3f& n, const float d, bool offset, bool sign);
 
     virtual float getRadius() const = 0;
     virtual float getRadiusSqrt() const = 0;
+    virtual Eigen::Matrix3f getInertiaMatrix() const;
+
     float getWeight() const;
     float getIWeight() const;
     float getElasticity() const;

@@ -17,7 +17,7 @@
 
 
 #define GENERAL_SCENARY_TYPE Simulation::ScenaryType::RigidBody
-#define GENERAL_SOLVER_TYPE Object::SolverType::SemiEuler
+#define GENERAL_SOLVER_TYPE Object::SolverType::Verlet
 
 #define GENERAL_LIGHT Eigen::Vector3f(1.0f, 1.0f, 1.0f)
 #define GENERAL_GRAVITY Eigen::Vector3f(0.0f, -9.81f, 0.0f)
