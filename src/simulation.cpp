@@ -11,6 +11,8 @@ Simulation::Simulation(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Simulation)
 {
+    initiatedScen = BLOCK;
+    initiatedSolv = BLOCK;
     ui->setupUi(this);
     ui->SolverMethod->insertItem(int(Object::SolverType::Euler), "Euler", Object::SolverType::Euler);
     ui->SolverMethod->insertItem(int(Object::SolverType::SemiEuler), "SemiEuler", Object::SolverType::SemiEuler);
@@ -42,6 +44,9 @@ Simulation::Simulation(QWidget *parent)
     ui->Mass->setValue(Simulation::m);
     ui->Plastic->setValue(Simulation::e);
     ui->Friction->setValue(Simulation::u);
+
+    initiatedScen = OPEN;
+    initiatedSolv = OPEN;
 }
 
 Simulation::~Simulation()
@@ -479,17 +484,7 @@ void Simulation::on_Kd_valueChanged(int value)
 void Simulation::on_ScenaryType_currentIndexChanged(int index)
 {
     if (initiatedScen == IndexType::OPEN) {
-        initiatedScen = IndexType::BLOCK;
-        Simulation::scenaryType = static_cast<ScenaryType>(index);
-        ui->openGLWidget->cleanScenary();
-        ui->openGLWidget->loadScenary();
-        initiatedScen = IndexType::OPEN;
-    }
-    else if (initiatedScen == IndexType::LOAD){
-        initiatedScen = IndexType::PRELOAD;
-    }
-    else if (initiatedScen == IndexType::PRELOAD) {
-        initiatedScen = IndexType::OPEN;
+        QCoreApplication::exit(index + 1);
     }
 }
 
@@ -497,16 +492,8 @@ void Simulation::on_ScenaryType_currentIndexChanged(int index)
 void Simulation::on_SolverMethod_currentIndexChanged(int index)
 {
     if (initiatedSolv == IndexType::OPEN) {
-        initiatedSolv = IndexType::BLOCK;
         Simulation::solverType = static_cast<Object::SolverType>(index);
         Object::setSolverModel(solverType);
-        initiatedSolv = IndexType::LOAD;
-    }
-    else if (initiatedSolv == IndexType::LOAD){
-        initiatedSolv = IndexType::PRELOAD;
-    }
-    else if (initiatedSolv == IndexType::PRELOAD) {
-        initiatedSolv = IndexType::OPEN;
     }
 }
 
