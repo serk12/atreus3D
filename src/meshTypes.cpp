@@ -6,6 +6,8 @@
 // GENERAL //
 // ******* //
 
+const float __TIME_SCALAR = 0.125f;
+
 void calculateNormal(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C, Eigen::Vector3f& n, float& d)
 {
     Eigen::Vector3f AB = B - A;
@@ -20,17 +22,30 @@ void calculateNormal(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const E
     }
 }
 
-inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const float r = 0.0f)
+
+void calculateNormal(const Eigen::Vector3f& c, const Eigen::Vector3f& P, Eigen::Vector3f& n, float& d)
+{
+    n = (P - c).normalized();
+    d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
+
+    if (d <= 0.0f) {
+        d = -d;
+        n = -1.0f*n;
+    }
+}
+
+inline bool planeCrossed(const Eigen::Vector3f& n, const float d, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const Eigen::Vector3f& v, const float r = 0.0f)
 {
     float d_aux = d - (r*n).norm();
-    return (n.dot(p) + d_aux) * (n.dot(p_pass) + d_aux) <= 0.0f;
+    return (n.dot(p - v*__TIME_SCALAR) + d_aux) * (n.dot(p_pass) + d_aux) <= 0.0f;
 }
 
 inline bool sphereVsSphere(Eigen::Vector3f p1, Eigen::Vector3f p2, float rs1, float rs2)
 {
     Eigen::Vector3f diff_p = p1 - p2;
-    return (((diff_p.transpose() * diff_p) - (rs1 + rs2)) <= 0);
+    return (((diff_p.transpose() * diff_p) - (rs1 + rs2)) <= 0.0f);
 }
+
 
 inline float areaTrangle(const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C)
 {
@@ -40,25 +55,37 @@ inline float areaTrangle(const Eigen::Vector3f& A, const Eigen::Vector3f& B, con
     return (BA.cross(CA)).norm()*0.5f;
 }
 
-inline bool triangleCrossed(const Eigen::Vector3f& n, const float d, const float r, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C, const float area)
+inline int triangleCrossed(const Eigen::Vector3f& n, const float d, const float r, const Eigen::Vector3f& p, const Eigen::Vector3f& p_pass, const Eigen::Vector3f& v,const Eigen::Vector3f& A, const Eigen::Vector3f& B, const Eigen::Vector3f& C, const float area)
 {
-    return planeCrossed(n, d, p, p_pass, r) and (areaTrangle(p, B, C) + areaTrangle(A, p, C) + areaTrangle(A, B, p) - area <= 0.01f);
+    int result = 0;
+    if (planeCrossed(-n, -d, p, p_pass, v, r)) {
+        result = -1;
+    }
+    else if (planeCrossed(n, d, p, p_pass, v, r)) {
+        result = 1;
+    }
+    if ((result != 0) and ((areaTrangle(p, B, C) + areaTrangle(A, p, C) + areaTrangle(A, B, p) - area) <= r)) {
+        return result;
+    }
+    return 0;
 }
 
 bool resolveSphereVsSphere(Object& a, Object& b)
 {
-    Eigen::Vector3f p = b.getPosition();
-    if (sphereVsSphere(p, a.getPosition(), a.getRadiusSqrt(), b.getRadiusSqrt())) {
+    Eigen::Vector3f p_n = b.getPosition() + b.getVelocity()*__TIME_SCALAR;
+    Eigen::Vector3f p_a = b.getPassPosition();
+    if (sphereVsSphere(p_n, a.getPosition(), a.getRadiusSqrt(), b.getRadiusSqrt())) {
         Eigen::Vector3f c = a.getPosition();
         Eigen::Vector3f v = b.getVelocity();
-        float alpha = v.dot(v), beta = (2*v).dot(p-c), gamma = c.dot(c) + p.dot(p)-(2*p).dot(c) - a.getRadiusSqrt();
-        float aux_1 = sqrt(beta*beta-4*alpha*gamma), aux_2 = 2*alpha;
+        float alpha = v.dot(v), beta = (2.0f*v).dot(p_a-c), gamma = c.dot(c) + p_a.dot(p_a)-(2.0f*p_a).dot(c) - a.getRadiusSqrt();
+        float aux_1 = sqrt(beta*beta-4.0f*alpha*gamma), aux_2 = 2.0f*alpha;
         float dir1 = (-beta+aux_1)/(aux_2);
         float dir2 = (-beta-aux_1)/(aux_2);
         if (std::isnan(dir1) && std::isnan(dir2)) return false;
         Eigen::Vector3f P = b.getPosition() + ((dir1 >= 0.0f)? dir2 : dir1)*v;
-        Eigen::Vector3f n = (P - c).normalized();
-        float d = -(n.x()*P.x() + n.y()*P.y() + n.z()*P.z());
+        Eigen::Vector3f n;
+        float d;
+        calculateNormal(c, P, n, d);
         b.correctObject(n, d, Object::POSITIVE_FORCE, Object::POSITIVE_FORCE);
         a.correctObject(n, d, Object::POSITIVE_FORCE, Object::NEGATIVE_FORCE);
     }
@@ -70,10 +97,12 @@ bool resolveTriangleVsSphere(Triangle& a, Object& b)
     Eigen::Vector3f aux_A = a.getVertex(0) + a.getPosition();
     Eigen::Vector3f aux_B = a.getVertex(1) + a.getPosition();
     Eigen::Vector3f aux_C = a.getVertex(2) + a.getPosition();
-    if (planeCrossed(a.getN(), a.getD(), b.getPosition(), b.getPassPosition(), b.getRadius()) and
-                    (areaTrangle(b.getPosition(), aux_B, aux_C) + areaTrangle(aux_A, b.getPosition(), aux_C) + areaTrangle(aux_A, aux_B, b.getPosition()) - a.getArea() <= 0.01f)) {
-        b.correctObject(a.getN(), a.getD(), Object::NEGATIVE_OFFSET, Object::POSITIVE_FORCE);
-        a.correctObject(a.getN(), a.getD(), Object::NEGATIVE_OFFSET, Object::NEGATIVE_FORCE);
+    Eigen::Vector3f n = a.getN();
+    float d = a.getD();
+    int collision = triangleCrossed(n, d, b.getRadius(), b.getPosition(), b.getPassPosition(), b.getVelocity(), aux_A, aux_B, aux_C, a.getArea());
+    if (collision != 0) {
+        b.correctObject(n, d, Object::POSITIVE_OFFSET, Object::POSITIVE_FORCE);
+        a.correctObject(n, d, Object::NEGATIVE_OFFSET, Object::NEGATIVE_FORCE);
         return true;
     }
     return false;
@@ -83,7 +112,7 @@ bool resolvePlaneVsSphere(Plane& a, Object& b)
 {
     Eigen::Vector3f n = a.getN();
     float d = a.getD();
-    if(planeCrossed(n, d, b.getPosition(), b.getPassPosition(), b.getRadius())) {
+    if(planeCrossed(n, d, b.getPosition(), b.getPassPosition(), b.getVelocity(), b.getRadius())) {
         b.correctObject(n, d, Object::NEGATIVE_OFFSET, Object::POSITIVE_FORCE);
         a.correctObject(n, d, Object::NEGATIVE_OFFSET, Object::NEGATIVE_FORCE);
         return true;
@@ -132,11 +161,11 @@ bool Sphere::isColliding(Object &object)
     else if (object.getID() < this->getID()){
         switch (object.getType()) {
         case ObjectType::_Plane:
-                break;
+                return resolvePlaneVsSphere(static_cast<Plane&>(object), *this);
         case ObjectType::_Polygon:
                 break;
         case ObjectType::_Triangle:
-                break;
+                return resolveTriangleVsSphere(static_cast<Triangle&>(object), *this);
         default:
             std::cout << "collision problem" << std::endl;
         break;
@@ -200,7 +229,11 @@ Eigen::Vector3f Triangle::getVertex(int id) const
     return Eigen::Vector3f::Zero();
 }
 
-float Triangle::getD() const {return d;}
+float Triangle::getD()
+{
+    calculateNormal(A + p, B + p, C + p, n, d);
+    return d;
+}
 float Triangle::getArea() const {return area;}
 Eigen::Vector3f Triangle::getN() const {return n;}
 
@@ -388,7 +421,7 @@ int Polygon::pointInPolygon(const Object& object) const {
                         n;
         float d;
         calculateNormal(A, B, C, n, d);
-        if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getRadius()) &&
+        if (planeCrossed(n, d, object.getPosition(), object.getPassPosition(), object.getVelocity(), object.getRadius()) &&
             polygonPoint(A, B, p)) {
             oddNodes = not oddNodes;
             if(first_col == -2) {

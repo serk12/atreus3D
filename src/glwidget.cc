@@ -101,7 +101,7 @@ void GLWidget::paintGL()
         Object::cameraMatrixCalc(camera_);
         float currentTime = frameTime.elapsed();
         float dt = currentTime - previousTime;
-        //dt = 3;
+//       dt = 3;
         previousTime = currentTime;
 
         for (Mesh* &o : objects.first) {

@@ -37,7 +37,7 @@ public:
     bool isColliding(Object& object) final;
     Eigen::Matrix3f getInertiaMatrix() const final;
     Eigen::Vector3f getVertex(int id) const;
-    float getD() const;
+    float getD();
     float getArea() const;
     Eigen::Vector3f getN() const;
     float r;

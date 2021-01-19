@@ -152,7 +152,7 @@ bool CubeScene(std::pair<std::list<Mesh*>, std::list<Particle*> >& objects)
         0,1,2,
         2,1,0,
     };
-    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(-0.75f, -0.50f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
+    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(0.025f, -0.20f, 0.025f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), -1);
     objects.first.push_back(t);
 
     Sphere *s = new Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), -1, 0.95f, 0.80f, 0.18f);
@@ -336,8 +336,8 @@ bool createCloth(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
 }
 
 bool createRigidBody(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects) {
-    //Polygon *p = new Polygon("../atreus3D/models/Patricio.obj" , Eigen::Vector3f(9.5f,-6.0f,0.0f), 10.0f, Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1);
-    //objects.first.push_back(p);
+//    Polygon *p = new Polygon("../atreus3D/models/Patricio.obj" , Eigen::Vector3f(9.5f,-6.0f,0.0f), 10.0f, Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 1.0f);
+//    objects.first.push_back(p);
     std::vector<float> box;
     std::vector<unsigned int> boxi;
     float r = 0.45f;
@@ -350,7 +350,7 @@ bool createRigidBody(std::pair<std::list<Mesh*>, std::list<Particle*> >&objects)
         0,1,2,
         2,1,0,
     };
-    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(0.0f, 0.12f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), 2.0f);
+    Triangle *t = new Triangle(box, boxi, Eigen::Vector3f(0.0f, 1.0f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.0f), 2.0f);
     objects.first.push_back(t);
     Sphere *s = new Sphere(Eigen::Vector3f(0.2f,0.5f,1.0f),  Eigen::Vector3f(0.0f,0.0f,0.0f), Eigen::Vector3f(0.0f,0.0f,0.0f), 3, 0.95f, 0.50f, 0.18f);
     objects.first.push_back(s);
@@ -407,7 +407,7 @@ void Simulation::addParticle(std::list<Particle*>& particleList)
     case ScenaryType::Fountain:
         b = new Particle(Eigen::Vector3f(0.0f+0.2f*rx, 0.5f+0.1f*ry, 0.0f+0.2f*rz), Eigen::Vector3f(2.0f*rx, 5.0f+5.0f*ry, 2.0f*rz), m, e, u);
         break;
-    case ScenaryType::RigidBody:
+    //case ScenaryType::RigidBody:
     case ScenaryType::Rain:
         b = new Particle(Eigen::Vector3f(rx*0.5f, 0.85f, rz*0.5f), Eigen::Vector3f(0.0f,0.0f,0.0f), m, e, u);
         break;
